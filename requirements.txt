@@ -1,0 +1,8 @@
+fastapi>=0.68.0,<0.69.0
+pydantic>=1.8.0,<2.0.0
+uvicorn>=0.15.0,<0.16.0
+gunicorn==20.1.0
+toolz==0.11.2
+python-box[all]~=6.0
+attrs==21.4.0
+shotgun-api3 @ git+https://github.com/shotgunsoftware/python-api.git@v3.3.3
