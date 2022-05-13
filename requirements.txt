@@ -5,4 +5,5 @@ gunicorn==20.1.0
 toolz==0.11.2
 python-box[all]~=6.0
 attrs==21.4.0
+fastapi-utils==0.2.1
 shotgun-api3 @ git+https://github.com/shotgunsoftware/python-api.git@v3.3.3

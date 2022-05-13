@@ -1,9 +1,10 @@
 import os
 
 import uvicorn
-from fastapi import FastAPI
 
-app = FastAPI()
+from app.setup import setup_app
+
+app = setup_app()
 
 
 def start():
