@@ -1,10 +1,11 @@
 import os
+from typing import Any
 
 import uvicorn
 
-from app.setup import setup_app
+from app.setup import setup_all
 
-app = setup_app()
+app = setup_all()
 
 
 def start():

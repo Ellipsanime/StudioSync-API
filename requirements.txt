@@ -3,6 +3,7 @@ pydantic>=1.8.0,<2.0.0
 uvicorn>=0.15.0,<0.16.0
 gunicorn==20.1.0
 toolz==0.11.2
+aiosqlite==0.17.0
 python-box[all]~=6.0
 attrs==21.4.0
 fastapi-utils==0.2.1
