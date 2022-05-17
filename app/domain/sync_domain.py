@@ -1,5 +1,8 @@
 from typing import Any
 
+from app.repo import sync_repo
+
 
 async def synchronize_events() -> Any:
-    pass
+    i = await sync_repo.fetch_last_event_id()
+    print(i)

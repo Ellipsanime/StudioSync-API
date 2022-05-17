@@ -41,12 +41,10 @@ def _setup_tasks(app: FastAPI) -> FastAPI:
     @app.on_event("startup")
     @repeat_every(seconds=30)
     async def synchronize_data() -> Any:
-        _LOG.info("synchronize_data")
         await sync_domain.synchronize_events()
 
     @app.on_event("startup")
     async def bootstrap_db() -> Any:
-        _LOG.info("bootstrap_db")
         if await ddl.db_exists():
             return
         _LOG.info("Setup database")

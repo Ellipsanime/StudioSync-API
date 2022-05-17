@@ -2,11 +2,9 @@ import os
 from functools import lru_cache
 from logging import Logger
 
-import aiosqlite
 import shotgun_api3 as sg
 from typing import List, Any, Dict, Union
 
-from aiosqlite import Connection
 from toolz import memoize
 
 from app.util.logger import get_logger
@@ -64,9 +62,5 @@ def shotgrid() -> ShotgridClient:
 @memoize
 def get_fields(type_: str) -> List[str]:
     return list(shotgrid().client.schema_field_read(type_).keys())
-
-
-def connect_file_db(flag: str = "rwc") -> Connection:
-    return aiosqlite.connect(f"file:{_DB}?mode={flag}", uri=True)
 
 
