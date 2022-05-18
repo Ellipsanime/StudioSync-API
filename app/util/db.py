@@ -1,4 +1,4 @@
-from typing import Tuple, Iterator, Generator, AsyncGenerator, Coroutine, List
+from typing import Tuple, List
 
 import aiosqlite
 from aiosqlite import Connection

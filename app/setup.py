@@ -1,4 +1,3 @@
-import datetime
 from typing import Any
 
 from fastapi import FastAPI
@@ -45,8 +44,8 @@ def _setup_tasks(app: FastAPI) -> FastAPI:
 
     @app.on_event("startup")
     async def bootstrap_db() -> Any:
-        if await ddl.db_exists():
-            return
+        # if await ddl.db_exists():
+        #     return
         _LOG.info("Setup database")
         await ddl.setup_db()
 
