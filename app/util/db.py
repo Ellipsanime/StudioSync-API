@@ -1,15 +1,18 @@
 from typing import Tuple, List
 
 import aiosqlite
-from aiosqlite import Connection
+from aiosqlite import Connection, Cursor
 from box import Box
 
 from app.util.connectivity import _DB
 from app.util.data import boxify
 
 
-def connect_file_db(flag: str = "rwc") -> Connection:
-    return aiosqlite.connect(f"file:{_DB}?mode={flag}", uri=True)
+async def connect_file_db(flag: str = "rwc") -> Connection:
+    db = await aiosqlite.connect(f"file:{_DB}?mode={flag}", uri=True)
+    cursor = await db.execute("PRAGMA foreign_keys = 1;")
+    await cursor.close()
+    return db
 
 
 async def fetch_one(
