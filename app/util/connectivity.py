@@ -10,7 +10,6 @@ from toolz import memoize
 from app.util.logger import get_logger
 
 Map = Dict[str, Any]
-_DB = os.environ.get("DB_PATH", "data.db")
 
 
 class ShotgridClient:

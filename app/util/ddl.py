@@ -79,14 +79,16 @@ AS
 --------------  CLIENT  ------------
 ------------------------------------
 CREATE TABLE IF NOT EXISTS client_project (
-    id INTEGER NOT NULL, 
+    id INTEGER NOT NULL,
+    origin_id INTEGER NOT NULL,
     source TEXT NOT NULL,
     title TEXT NOT NULL,
     code TEXT NOT NULL,
-    PRIMARY KEY (id, source)
+    PRIMARY KEY (id)
 );
 CREATE TABLE IF NOT EXISTS client_file (
     id INTEGER NOT NULL, 
+    origin_id INTEGER NOT NULL,
     code TEXT NOT NULL,
     datetime INTEGER NOT NULL,
     project_id INTEGER NOT NULL,
@@ -95,11 +97,12 @@ CREATE TABLE IF NOT EXISTS client_file (
     extension TEXT NOT NULL,
     path TEXT NOT NULL,
     source TEXT NOT NULL,
-    PRIMARY KEY (id, source),
+    PRIMARY KEY (id),
     FOREIGN KEY (project_id) REFERENCES client_project (id)
 );
 CREATE TABLE IF NOT EXISTS client_version_change (
     id INTEGER NOT NULL,
+    origin_id INTEGER NOT NULL,
     source TEXT NOT NULL,
     datetime INTEGER NOT NULL,
     project_id INTEGER NOT NULL,
@@ -110,7 +113,7 @@ CREATE TABLE IF NOT EXISTS client_version_change (
     revision INTEGER NOT NULL,
     comment TEXT NOT NULL,
     processed INTEGER NOT NULL,
-    PRIMARY KEY (id, source),
+    PRIMARY KEY (id),
     FOREIGN KEY (project_id) REFERENCES client_project (id)
 );
 CREATE TABLE IF NOT EXISTS client_linked_files (
@@ -120,7 +123,7 @@ CREATE TABLE IF NOT EXISTS client_linked_files (
     FOREIGN KEY (file_id) REFERENCES client_file (id),
     FOREIGN KEY (version_change_id) REFERENCES client_version_change (id)
 );
-CREATE TABLE IF NOT EXISTS client_sources (
+CREATE TABLE IF NOT EXISTS client_source (
     id INTEGER PRIMARY KEY NOT NULL,
     uri TEXT NOT NULL,
     meta TEXT
@@ -130,6 +133,7 @@ CREATE VIEW IF NOT EXISTS client_version_file_view
 AS
     SELECT
            pvc.id as version_id,
+           pvc.origin_id as version_origin_id,
            pvc.datetime as version_datetime,
            pvc.status as version_status,
            pvc.source as version_source,
@@ -142,6 +146,7 @@ AS
            pvc.revision as version_revision,
            pvc.comment as version_comment,
            pf.id as file_id,
+           pf.origin_id as file_origin_id,
            pf.code as file_code,
            pf.datetime as file_datetime,
            pf.task as file_task,

@@ -1,11 +1,13 @@
-from typing import Tuple, List
+import os
+from typing import Tuple, List, Any
 
 import aiosqlite
 from aiosqlite import Connection, Cursor
 from box import Box
 
-from app.util.connectivity import _DB
 from app.util.data import boxify
+
+_DB = os.environ.get("DB_PATH", "data.db")
 
 
 async def connect_file_db(flag: str = "rwc") -> Connection:
@@ -13,6 +15,22 @@ async def connect_file_db(flag: str = "rwc") -> Connection:
     cursor = await db.execute("PRAGMA foreign_keys = 1;")
     await cursor.close()
     return db
+
+
+async def write_data(
+    query: str,
+    params: Tuple | None = None,
+) -> Box:
+
+    db = await connect_file_db()
+    cursor = await db.execute(query, params)
+    result = boxify({"row_count": cursor.rowcount, "last_id": cursor.lastrowid})
+
+    await db.commit()
+    await cursor.close()
+    await db.close()
+
+    return result
 
 
 async def fetch_one(
