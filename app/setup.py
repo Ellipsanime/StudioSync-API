@@ -1,11 +1,13 @@
+from functools import lru_cache
 from typing import Any
 
 from fastapi import FastAPI
 from fastapi_utils.tasks import repeat_every
+from returns.pipeline import pipe
 from starlette.middleware.cors import CORSMiddleware
-from toolz import memoize, compose
 
 from app.controller import metadata_controller as meta
+from app.controller import client_controller as client
 from app.domain import sync_domain
 from app.util import ddl
 from app.util.logger import get_logger
@@ -28,10 +30,11 @@ def _setup_cors(app: FastAPI) -> FastAPI:
     return app
 
 
-@memoize
+@lru_cache
 def _setup_app() -> FastAPI:
     app = FastAPI(**{})
     app.include_router(meta.router)
+    app.include_router(client.router)
     return app
 
 
@@ -52,4 +55,4 @@ def _setup_tasks(app: FastAPI) -> FastAPI:
     return app
 
 
-setup_all = compose(_setup_tasks, _setup_cors, _setup_app)
+setup_all = pipe(lambda _: _setup_app(), _setup_cors, _setup_tasks)

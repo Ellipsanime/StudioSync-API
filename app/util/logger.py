@@ -1,14 +1,14 @@
 import logging
 import sys
+from functools import lru_cache
 
-from toolz import memoize
 
 _FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 logging.basicConfig(format=_FORMAT, level=logging.INFO)
 
 
-@memoize
+@lru_cache
 def global_logger() -> logging.Logger:
     logging.basicConfig(format=_FORMAT, level=logging.INFO)
     logger = logging.getLogger("global")

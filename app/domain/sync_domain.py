@@ -1,8 +1,7 @@
 from typing import Any
 
-from app.repo import sync_repo
+from app.repo import sync_repo, client_repo
 
 
 async def synchronize_events() -> Any:
-    i = await sync_repo.fetch_last_event_id()
-    print(i)
+    await client_repo.fetch_version_changes_per_project(1)

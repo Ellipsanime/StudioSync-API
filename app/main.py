@@ -4,7 +4,7 @@ import uvicorn
 
 from app.setup import setup_all
 
-app = setup_all()
+app = setup_all(None)
 
 
 def start():

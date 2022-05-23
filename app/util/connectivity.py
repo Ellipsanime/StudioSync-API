@@ -5,7 +5,6 @@ from logging import Logger
 import shotgun_api3 as sg
 from typing import List, Any, Dict, Union
 
-from toolz import memoize
 
 from app.util.logger import get_logger
 
@@ -58,7 +57,7 @@ def shotgrid() -> ShotgridClient:
     return ShotgridClient(client)
 
 
-@memoize
+@lru_cache
 def get_fields(type_: str) -> List[str]:
     return list(shotgrid().client.schema_field_read(type_).keys())
 

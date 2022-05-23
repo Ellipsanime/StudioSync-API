@@ -123,9 +123,8 @@ CREATE TABLE IF NOT EXISTS client_linked_files (
     FOREIGN KEY (file_id) REFERENCES client_file (id),
     FOREIGN KEY (version_change_id) REFERENCES client_version_change (id)
 );
-CREATE TABLE IF NOT EXISTS client_source (
-    id INTEGER PRIMARY KEY NOT NULL,
-    uri TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS client_ingest_source (
+    uri TEXT PRIMARY KEY NOT NULL,
     meta TEXT
 );
 
@@ -135,7 +134,6 @@ AS
            pvc.id as version_id,
            pvc.origin_id as version_origin_id,
            pvc.datetime as version_datetime,
-           pvc.status as version_status,
            pvc.source as version_source,
            pp.id as project_id,
            pp.title as project_title,
@@ -144,6 +142,7 @@ AS
            pvc.entity_name as version_entity_name,
            pvc.status as version_status,
            pvc.revision as version_revision,
+           pvc.processed as version_processed,
            pvc.comment as version_comment,
            pf.id as file_id,
            pf.origin_id as file_origin_id,
