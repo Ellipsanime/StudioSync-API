@@ -9,6 +9,19 @@ from app.util.data import boxify
 _R = Generic(locale=Locale.DE)
 
 
+def generate_client_source(num: int = 5) -> List[Box]:
+    return [
+        boxify(
+            {
+                "code": f"source_{_R.person.identifier()}_{x}",
+                "uri": _R.internet.uri(),
+                "meta": f"{_R.person.full_name()} {_R.person.university()}",
+            }
+        )
+        for x in range(1, num + 1)
+    ]
+
+
 def generate_client_projects(source: str, num: int = 5) -> List[Box]:
     return [
         boxify(
@@ -16,7 +29,7 @@ def generate_client_projects(source: str, num: int = 5) -> List[Box]:
                 "id": x,
                 "origin_id": _R.numeric.increment(),
                 "source": source,
-                "title": f"{_R.person.full_name()} {_R.person.university()}",
+                "name": f"{_R.person.full_name()} {_R.person.university()}",
                 "code": _R.person.identifier(),
             }
         )
@@ -25,7 +38,6 @@ def generate_client_projects(source: str, num: int = 5) -> List[Box]:
 
 
 def generate_client_version_changes(
-    source: str,
     project_id: int,
     num: int = 5,
 ) -> List[Box]:
@@ -34,7 +46,6 @@ def generate_client_version_changes(
             {
                 "id": x,
                 "origin_id": _R.numeric.increment(),
-                "source": source,
                 "datetime": _R.datetime.datetime().timestamp(),
                 "project_id": project_id,
                 "entity_type": _R.address.country_code(),
@@ -51,18 +62,16 @@ def generate_client_version_changes(
 
 
 def generate_client_files(
-    source: str,
-    project_id: int,
     num: int = 5,
+    version_id=lambda x: int(x / 10) if int(x / 10) else 1
 ) -> List[Box]:
     return [
         boxify(
             {
                 "id": x,
                 "origin_id": _R.numeric.increment(),
-                "source": source,
                 "datetime": _R.datetime.datetime().timestamp(),
-                "project_id": project_id,
+                "version_change_id": version_id(x),
                 "code": _R.address.country_code(),
                 "task": _R.person.surname(),
                 "element": _R.person.surname(),
