@@ -4,19 +4,18 @@ from box import Box
 from mimesis import Generic
 from mimesis.enums import Locale
 
+from app.record.dto import ClientIngestSource
 from app.util.data import boxify
 
 _R = Generic(locale=Locale.DE)
 
 
-def generate_client_source(num: int = 5) -> List[Box]:
+def generate_client_source(num: int = 5) -> List[ClientIngestSource]:
     return [
-        boxify(
-            {
-                "code": f"source_{_R.person.identifier()}_{x}",
-                "uri": _R.internet.uri(),
-                "meta": f"{_R.person.full_name()} {_R.person.university()}",
-            }
+        ClientIngestSource(
+            f"source_{_R.person.identifier()}_{x}",
+            _R.internet.uri(),
+            {"key": f"{_R.person.full_name()} {_R.person.university()}"},
         )
         for x in range(1, num + 1)
     ]
@@ -62,8 +61,7 @@ def generate_client_version_changes(
 
 
 def generate_client_files(
-    num: int = 5,
-    version_id=lambda x: int(x / 10) if int(x / 10) else 1
+    num: int = 5, version_id=lambda x: int(x / 10) if int(x / 10) else 1
 ) -> List[Box]:
     return [
         boxify(
@@ -81,4 +79,3 @@ def generate_client_files(
         )
         for x in range(1, num + 1)
     ]
-
