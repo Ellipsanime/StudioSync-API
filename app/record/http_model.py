@@ -1,9 +1,9 @@
-import validators
-from box import Box
-from pydantic import BaseModel, Field, validator
-from pydantic.fields import ModelField
-from pydantic.main import ModelMetaclass
 from datetime import datetime
+from typing import Dict
+
+from box import Box
+from pydantic import BaseModel, AnyUrl
+# from pydantic.json import Dict
 
 from app.util.data import boxify
 
@@ -13,49 +13,49 @@ def boxify_http_model(model: BaseModel) -> Box:
 
 
 class IngestSourceHttpModel(BaseModel):
-    name: str = Field(title="source name")
-    uri: str = Field(title="queryable source uri")
-    meta: str | None = Field(title="related meta data")
+    name: str
+    uri: AnyUrl
+    meta: Dict | None
 
 
 class ClientProjectHttpModel(BaseModel):
-    id: int | None = Field(title="internal project id")
-    origin_id: int = Field(title="origin id")
-    source: str = Field(title="source of project")
-    name: str = Field(title="project name")
-    code: str | None = Field(title="project code")
+    id: int | None
+    origin_id: int
+    source: str
+    name: str
+    code: str | None
 
 
 class ProviderProjectHttpModel(BaseModel):
-    id: int | None = Field(title="internal project id")
-    origin_id: int = Field(title="origin id")
-    name: str = Field(title="project name")
-    code: str | None = Field(title="project code")
+    id: int | None
+    origin_id: int
+    name: str
+    code: str | None
 
 
 class VersionChangeHttpModel(BaseModel):
-    id: int | None = Field(title="internal id")
-    origin_id: int = Field(title="origin id")
-    datetime: datetime = Field(title="date")
-    project_id: int = Field(title="internal project id")
-    entity_type: str = Field(title="related entity type")
-    entity_name: str = Field(title="related entity name")
-    task: str = Field(title="related task")
-    status: str = Field(title="change status")
-    revision: str = Field(title="revision number")
-    comment: str = Field(title="related comment")
-    processed: bool = Field(title="processed indicator")
+    id: int | None
+    origin_id: int
+    datetime: datetime
+    project_id: int
+    entity_type: str
+    entity_name: str
+    task: str
+    status: str
+    revision: str
+    comment: str
+    processed: bool
 
 
 class FileHttpModel(BaseModel):
-    id: int | None = Field(title="internal id")
-    origin_id: int = Field(title="origin id")
-    code: str = Field(title="file code")
-    datetime: datetime = Field(title="file date")
-    version_change_id: int = Field(title="related version change id")
-    task: str = Field(title="related task")
-    element: str = Field(title="nature of the file")
-    extension: str = Field(title="file extension")
-    path: str = Field(title="physical path")
+    id: int | None
+    origin_id: int
+    code: str
+    datetime: datetime
+    version_change_id: int
+    task: str
+    element: str
+    extension: str
+    path: str
 
 

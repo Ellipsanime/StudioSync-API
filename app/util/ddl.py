@@ -26,7 +26,10 @@ CREATE TABLE IF NOT EXISTS provider_file (
     element TEXT NOT NULL,
     extension TEXT NOT NULL,
     path TEXT NOT NULL,
-    FOREIGN KEY (version_change_id) REFERENCES provider_version_change (id)
+    CONSTRAINT fk_pvc
+        FOREIGN KEY (version_change_id) 
+        REFERENCES provider_version_change (id) 
+        ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS provider_version_change (
     id INTEGER PRIMARY KEY NOT NULL,
@@ -38,7 +41,10 @@ CREATE TABLE IF NOT EXISTS provider_version_change (
     status TEXT NOT NULL,
     revision INTEGER NOT NULL,
     comment TEXT NOT NULL,
-    FOREIGN KEY (project_id) REFERENCES provider_project (id)
+    CONSTRAINT fk_pp
+        FOREIGN KEY (project_id) 
+        REFERENCES provider_project (id) 
+        ON DELETE CASCADE
 );
 
 CREATE VIEW IF NOT EXISTS provider_version_file_view
@@ -76,7 +82,10 @@ CREATE TABLE IF NOT EXISTS client_project (
     name TEXT NOT NULL,
     code TEXT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (source) REFERENCES client_ingest_source (name)
+    CONSTRAINT fk_cis
+        FOREIGN KEY (source) 
+        REFERENCES client_ingest_source (name)
+        ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS client_file (
     id INTEGER NOT NULL, 
@@ -89,7 +98,8 @@ CREATE TABLE IF NOT EXISTS client_file (
     extension TEXT NOT NULL,
     path TEXT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (version_change_id) REFERENCES client_version_change (id)
+    FOREIGN KEY (version_change_id) 
+        REFERENCES client_version_change (id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS client_version_change (
     id INTEGER NOT NULL,
@@ -104,7 +114,8 @@ CREATE TABLE IF NOT EXISTS client_version_change (
     comment TEXT NOT NULL,
     processed INTEGER NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES client_project (id)
+    FOREIGN KEY (project_id)
+        REFERENCES client_project (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS client_ingest_source (

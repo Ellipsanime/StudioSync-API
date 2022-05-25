@@ -1,5 +1,7 @@
+import jsonpickle
 from box import Box
 
+from app.record.dto import ClientIngestSource
 from app.util import db
 from app.util.data import to_record, boxify
 
@@ -27,11 +29,10 @@ VALUES (?, ?, ?)
 """
 
 
-async def upsert_source(raw_source: Box) -> Box:
-    source = boxify({"meta": None, **raw_source.to_dict()})
+async def upsert_ingest_source(source: ClientIngestSource) -> Box:
     return await db.write_data(
         _SQL_REPLACE_SOURCE,
-        (source.code, source.uri, source.meta),
+        (source.name, source.uri, jsonpickle.dumps(source.meta)),
     )
 
 

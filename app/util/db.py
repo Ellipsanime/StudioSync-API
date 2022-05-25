@@ -29,7 +29,7 @@ async def write_data(
         db = await connect_file_db()
         cursor = await db.execute(query, params)
         result = boxify(
-            {"row_count": cursor.rowcount, "last_id": cursor.lastrowid}
+            {"row_count": cursor.rowcount}
         )
 
         await db.commit()

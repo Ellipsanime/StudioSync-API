@@ -1,13 +1,20 @@
 from typing import List, Any
+from returns.pipeline import flow
 
 from box import Box
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.record.command import CreateClientProjectCommand
+from app.domain.client_domain import create_or_update_ingest_source
+from app.record.command import (
+    CreateClientProjectCommand,
+    ReplaceIngestSourceCommand,
+)
 from app.record.http_model import (
     ClientProjectHttpModel,
     VersionChangeHttpModel,
-    IngestSourceHttpModel, FileHttpModel, boxify_http_model,
+    IngestSourceHttpModel,
+    FileHttpModel,
+    boxify_http_model,
 )
 from app.repo import client_repo
 
@@ -31,14 +38,18 @@ async def version_changes() -> List[Box]:
 
 
 @router.post("/project")
-async def create_project(project_model: ClientProjectHttpModel) -> Any:
+async def create_project(
+    project_model: ClientProjectHttpModel = Depends(ClientProjectHttpModel),
+) -> Any:
     model_box = boxify_http_model(project_model)
     command = CreateClientProjectCommand.unbox(model_box)
 
 
 @router.post("/version_change")
 async def create_version_change(
-    version_change_model: VersionChangeHttpModel,
+    version_change_model: VersionChangeHttpModel = Depends(
+        VersionChangeHttpModel
+    ),
 ) -> Any:
     pass
 
@@ -47,7 +58,12 @@ async def create_version_change(
 async def replace_ingest_source(
     ingest_source_model: IngestSourceHttpModel,
 ) -> Any:
-    pass
+    return await flow(
+        ingest_source_model,
+        boxify_http_model,
+        ReplaceIngestSourceCommand.unbox,
+        create_or_update_ingest_source,
+    )
 
 
 @router.delete("/{source_id}/ingest_source")
@@ -56,10 +72,14 @@ async def remove_ingest_source(source_id: int) -> Any:
 
 
 @router.post("/file")
-async def create_file(file_model: FileHttpModel) -> Any:
+async def create_file(
+    file_model: FileHttpModel = Depends(FileHttpModel),
+) -> Any:
     pass
 
 
 @router.put("/{version_change_id}/version_change")
-async def update_version_change(version_change_id: int, processed: bool) -> Any:
+async def update_version_change(
+    version_change_id: int, processed: bool
+) -> Any:
     pass

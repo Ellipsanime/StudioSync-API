@@ -9,4 +9,5 @@ attrs==21.4.0
 fastapi-utils==0.2.1
 starlette==0.14.2
 validators==0.19.0
+jsonpickle==2.2.0
 shotgun-api3 @ git+https://github.com/shotgunsoftware/python-api.git@v3.3.3

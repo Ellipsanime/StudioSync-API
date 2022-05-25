@@ -1,17 +1,23 @@
+from typing import Dict
+
 import attr
 from box import Box
 from datetime import datetime
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class IngestSourceCommand:
+class ReplaceIngestSourceCommand:
     name: str
     uri: str
-    meta: str | None
+    meta: Dict | None
 
     @staticmethod
-    def unbox(data: Box) -> "IngestSourceCommand":
-        return IngestSourceCommand(data.name, data.uri, data.meta or None)
+    def unbox(data: Box) -> "ReplaceIngestSourceCommand":
+        return ReplaceIngestSourceCommand(
+            data.name,
+            data.uri,
+            data.meta or None,
+        )
 
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -98,4 +104,3 @@ class CreateFileCommand:
             data.extension,
             data.path,
         )
-
