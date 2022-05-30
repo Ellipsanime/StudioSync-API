@@ -1,5 +1,9 @@
+from sqlite3 import IntegrityError
+
 import jsonpickle
 from box import Box
+from returns.future import future_safe
+from returns.result import safe
 
 from app.record.dto import ClientIngestSource
 from app.util import db
@@ -27,6 +31,15 @@ _SQL_REPLACE_SOURCE = """
 REPLACE INTO client_ingest_source (name, uri, meta)
 VALUES (?, ?, ?)
 """
+
+_SQL_DELETE_SOURCE = """
+DELETE FROM client_ingest_source WHERE name = ?
+"""
+
+
+@future_safe
+async def remove_ingest_source(source_name: str) -> Box:
+    return await db.write_data(_SQL_DELETE_SOURCE, (source_name,),)
 
 
 async def upsert_ingest_source(source: ClientIngestSource) -> Box:

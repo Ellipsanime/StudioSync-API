@@ -1,13 +1,19 @@
+import urllib.parse
 from typing import List, Any
+
+from returns.io import IOFailure, IOSuccess
 from returns.pipeline import flow
 
 from box import Box
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from returns.pointfree import bind
+from returns.result import Success, Failure
 
+from app.domain import client_domain
 from app.domain.client_domain import create_or_update_ingest_source
 from app.record.command import (
     CreateClientProjectCommand,
-    ReplaceIngestSourceCommand,
+    ReplaceIngestSourceCommand, DeleteIngestSourceCommand,
 )
 from app.record.http_model import (
     ClientProjectHttpModel,
@@ -17,7 +23,9 @@ from app.record.http_model import (
     boxify_http_model,
 )
 from app.repo import client_repo
+from app.util.logger import get_logger
 
+_LOG = get_logger(__name__.split(".")[-1])
 
 router = APIRouter(tags=["client"], prefix="/client")
 
@@ -66,9 +74,25 @@ async def replace_ingest_source(
     )
 
 
-@router.delete("/{source_id}/ingest_source")
-async def remove_ingest_source(source_id: int) -> Any:
-    pass
+@router.delete("/{source_name}/ingest_source")
+async def remove_ingest_source(source_name: str) -> Any:
+    result = await flow(
+        source_name,
+        urllib.parse.unquote,
+        DeleteIngestSourceCommand,
+        client_domain.remove_ingest_source,
+    )
+    match result:
+        case IOSuccess(Success(x)):
+            return dict(x)
+        case IOFailure(Failure(ex)):
+            _LOG.error(str(ex))
+            raise HTTPException(status_code=400, detail=str(ex))
+        case _:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Unable to process {result}",
+            )
 
 
 @router.post("/file")

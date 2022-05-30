@@ -6,6 +6,11 @@ from datetime import datetime
 
 
 @attr.s(auto_attribs=True, frozen=True)
+class DeleteIngestSourceCommand:
+    source_name: str
+
+
+@attr.s(auto_attribs=True, frozen=True)
 class ReplaceIngestSourceCommand:
     name: str
     uri: str

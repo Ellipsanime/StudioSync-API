@@ -25,8 +25,8 @@ async def write_data(
     params: Tuple | None = None,
 ) -> Box:
 
+    db = await connect_file_db()
     try:
-        db = await connect_file_db()
         cursor = await db.execute(query, params)
         result = boxify(
             {"row_count": cursor.rowcount}
@@ -34,12 +34,19 @@ async def write_data(
 
         await db.commit()
         await cursor.close()
-        await db.close()
 
         return result
     except Exception as ex:
         _LOG.exception(ex)
         raise ex
+    finally:
+        if db:
+            await db.close()
+    # else:
+    #     await db.commit()
+    #     await cursor.close()
+    #     await db.close()
+
 
 
 async def fetch_one(

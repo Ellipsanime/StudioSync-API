@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS provider_file (
     CONSTRAINT fk_pvc
         FOREIGN KEY (version_change_id) 
         REFERENCES provider_version_change (id) 
-        ON DELETE CASCADE
 );
+
 CREATE TABLE IF NOT EXISTS provider_version_change (
     id INTEGER PRIMARY KEY NOT NULL,
     datetime INTEGER NOT NULL,
@@ -44,8 +44,39 @@ CREATE TABLE IF NOT EXISTS provider_version_change (
     CONSTRAINT fk_pp
         FOREIGN KEY (project_id) 
         REFERENCES provider_project (id) 
-        ON DELETE CASCADE
 );
+
+CREATE TRIGGER IF NOT EXISTS UndeleteProviderProjects 
+BEFORE DELETE ON provider_project
+FOR EACH ROW
+WHEN EXISTS (
+  SELECT 1 
+  FROM provider_version_change pvc
+  WHERE pvc.project_id = OLD.id
+)
+BEGIN      
+  SELECT 
+    RAISE(
+        ABORT,
+        'Can not delete project when it still has related version changes'
+    ); 
+END;
+
+CREATE TRIGGER IF NOT EXISTS UndeleteProviderVersionChange 
+BEFORE DELETE ON provider_version_change
+FOR EACH ROW
+WHEN EXISTS (
+  SELECT 1 
+  FROM provider_file pf
+  WHERE pf.version_change_id = OLD.id
+)
+BEGIN      
+  SELECT 
+    RAISE(
+        ABORT,
+        'Can not delete version change when it still has related files'
+    ); 
+END;
 
 CREATE VIEW IF NOT EXISTS provider_version_file_view
 AS
@@ -85,7 +116,6 @@ CREATE TABLE IF NOT EXISTS client_project (
     CONSTRAINT fk_cis
         FOREIGN KEY (source) 
         REFERENCES client_ingest_source (name)
-        ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS client_file (
     id INTEGER NOT NULL, 
@@ -99,7 +129,7 @@ CREATE TABLE IF NOT EXISTS client_file (
     path TEXT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (version_change_id) 
-        REFERENCES client_version_change (id) ON DELETE CASCADE
+        REFERENCES client_version_change (id) 
 );
 CREATE TABLE IF NOT EXISTS client_version_change (
     id INTEGER NOT NULL,
@@ -115,7 +145,7 @@ CREATE TABLE IF NOT EXISTS client_version_change (
     processed INTEGER NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (project_id)
-        REFERENCES client_project (id) ON DELETE CASCADE
+        REFERENCES client_project (id) 
 );
 
 CREATE TABLE IF NOT EXISTS client_ingest_source (
@@ -123,6 +153,54 @@ CREATE TABLE IF NOT EXISTS client_ingest_source (
     uri TEXT NOT NULL,
     meta TEXT
 );
+
+CREATE TRIGGER IF NOT EXISTS UndeleteClientIngestSource 
+BEFORE DELETE ON client_ingest_source
+FOR EACH ROW
+WHEN EXISTS (
+  SELECT 1 
+  FROM client_project cp
+  WHERE cp.source = OLD.name
+)
+BEGIN      
+  SELECT 
+    RAISE(
+        ABORT,
+        'Can not delete ingest source when it still has related projects'
+    ); 
+END;
+
+CREATE TRIGGER IF NOT EXISTS UndeleteClientProjects 
+BEFORE DELETE ON client_project
+FOR EACH ROW
+WHEN EXISTS (
+  SELECT 1 
+  FROM client_version_change cvc
+  WHERE cvc.project_id = OLD.id
+)
+BEGIN      
+  SELECT 
+    RAISE(
+        ABORT,
+        'Can not delete project when it still has related version changes'
+    ); 
+END;
+
+CREATE TRIGGER IF NOT EXISTS UndeleteClientVersionChange 
+BEFORE DELETE ON client_version_change
+FOR EACH ROW
+WHEN EXISTS (
+  SELECT 1 
+  FROM client_file cf
+  WHERE cf.version_change_id = OLD.id
+)
+BEGIN      
+  SELECT 
+    RAISE(
+        ABORT,
+        'Can not delete version change when it still has related files'
+    ); 
+END;
 
 CREATE VIEW IF NOT EXISTS client_version_file_view
 AS
