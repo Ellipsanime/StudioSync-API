@@ -26,15 +26,17 @@ class ReplaceIngestSourceCommand:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class CreateClientProjectCommand:
+class ReplaceClientProjectCommand:
+    id: int | None
     origin_id: int
     source: str
     name: str
     code: str | None
 
     @staticmethod
-    def unbox(data: Box) -> "CreateClientProjectCommand":
-        return CreateClientProjectCommand(
+    def unbox(data: Box) -> "ReplaceClientProjectCommand":
+        return ReplaceClientProjectCommand(
+            data.id or None,
             data.origin_id,
             data.source,
             data.name,

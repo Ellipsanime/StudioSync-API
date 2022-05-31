@@ -15,3 +15,12 @@ class ClientIngestSource:
     name: str
     uri: str
     meta: Dict | None
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class ClientProject:
+    id: int | None
+    origin_id: int
+    source: str
+    name: str
+    code: str | None

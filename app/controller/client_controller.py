@@ -10,9 +10,10 @@ from returns.pointfree import bind
 from returns.result import Success, Failure
 
 from app.domain import client_domain
-from app.domain.client_domain import create_or_update_ingest_source
+from app.domain.client_domain import create_or_update_ingest_source, \
+    create_or_update_project
 from app.record.command import (
-    CreateClientProjectCommand,
+    ReplaceClientProjectCommand,
     ReplaceIngestSourceCommand, DeleteIngestSourceCommand,
 )
 from app.record.http_model import (
@@ -23,6 +24,7 @@ from app.record.http_model import (
     boxify_http_model,
 )
 from app.repo import client_repo
+from app.util.controller import process_result
 from app.util.logger import get_logger
 
 _LOG = get_logger(__name__.split(".")[-1])
@@ -46,20 +48,26 @@ async def version_changes() -> List[Box]:
 
 
 @router.post("/project")
-async def create_project(
-    project_model: ClientProjectHttpModel = Depends(ClientProjectHttpModel),
+async def replace_project(
+    project_model: ClientProjectHttpModel,
 ) -> Any:
-    model_box = boxify_http_model(project_model)
-    command = CreateClientProjectCommand.unbox(model_box)
+    return await flow(
+        project_model,
+        boxify_http_model,
+        ReplaceClientProjectCommand.unbox,
+        create_or_update_project,
+        process_result,
+    )
 
 
 @router.post("/version_change")
 async def create_version_change(
-    version_change_model: VersionChangeHttpModel = Depends(
-        VersionChangeHttpModel
-    ),
+    version_change_model: VersionChangeHttpModel
 ) -> Any:
-    pass
+    return await flow(
+        version_change_model,
+        boxify_http_model,
+    )
 
 
 @router.post("/ingest_source")
@@ -71,28 +79,19 @@ async def replace_ingest_source(
         boxify_http_model,
         ReplaceIngestSourceCommand.unbox,
         create_or_update_ingest_source,
+        process_result,
     )
 
 
 @router.delete("/{source_name}/ingest_source")
 async def remove_ingest_source(source_name: str) -> Any:
-    result = await flow(
+    return await flow(
         source_name,
         urllib.parse.unquote,
         DeleteIngestSourceCommand,
         client_domain.remove_ingest_source,
+        process_result,
     )
-    match result:
-        case IOSuccess(Success(x)):
-            return dict(x)
-        case IOFailure(Failure(ex)):
-            _LOG.error(str(ex))
-            raise HTTPException(status_code=400, detail=str(ex))
-        case _:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Unable to process {result}",
-            )
 
 
 @router.post("/file")

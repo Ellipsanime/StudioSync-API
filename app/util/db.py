@@ -12,12 +12,16 @@ _DB = os.environ.get("DB_PATH", "data.db")
 _LOG = get_logger(__name__.split(".")[-1])
 
 
-async def connect_file_db(flag: str = "rwc") -> Connection:
-    db = await aiosqlite.connect(f"file:{_DB}?mode={flag}", uri=True)
-    cursor = await db.execute("PRAGMA foreign_keys = 1;")
-    await cursor.close()
-    db.row_factory = aiosqlite.Row
-    return db
+async def connect_file_db(flag: str = "rwc") -> Connection | None:
+    try:
+        db = await aiosqlite.connect(f"file:{_DB}?mode={flag}", uri=True)
+        cursor = await db.execute("PRAGMA foreign_keys = 1;")
+        await cursor.close()
+        db.row_factory = aiosqlite.Row
+        return db
+    except Exception as ex:
+        _LOG.error(ex)
+        return None
 
 
 async def write_data(
@@ -26,6 +30,8 @@ async def write_data(
 ) -> Box:
 
     db = await connect_file_db()
+    if not db:
+        raise Exception("Unable to connect the db")
     try:
         cursor = await db.execute(query, params)
         result = boxify(
@@ -42,11 +48,6 @@ async def write_data(
     finally:
         if db:
             await db.close()
-    # else:
-    #     await db.commit()
-    #     await cursor.close()
-    #     await db.close()
-
 
 
 async def fetch_one(
@@ -54,8 +55,11 @@ async def fetch_one(
     params: Tuple | None = None,
 ) -> Box:
 
+    db = await connect_file_db()
+    if not db:
+        raise Exception("Unable to connect the db")
+
     try:
-        db = await connect_file_db()
         cursor = await db.execute(query, params)
         row = await cursor.fetchone()
         result = boxify(dict(zip(row.keys(), row)))
@@ -73,9 +77,11 @@ async def fetch_all(
     query: str,
     params: Tuple | None = None,
 ) -> List[Box]:
-
+    
+    db = await connect_file_db()
+    if not db:
+        raise Exception("Unable to connect the db")
     try:
-        db = await connect_file_db()
         cursor = await db.execute(query, params)
         rows = await cursor.fetchall()
         result = [boxify(dict(zip(x.keys(), x))) for x in rows]
@@ -87,3 +93,6 @@ async def fetch_all(
     except Exception as ex:
         _LOG.exception(ex)
         raise ex
+    finally:
+        if db:
+            await db.close()

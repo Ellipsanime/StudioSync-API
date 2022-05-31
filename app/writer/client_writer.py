@@ -5,7 +5,7 @@ from box import Box
 from returns.future import future_safe
 from returns.result import safe
 
-from app.record.dto import ClientIngestSource
+from app.record.dto import ClientIngestSource, ClientProject
 from app.util import db
 from app.util.data import to_record, boxify
 
@@ -39,18 +39,26 @@ DELETE FROM client_ingest_source WHERE name = ?
 
 @future_safe
 async def remove_ingest_source(source_name: str) -> Box:
-    return await db.write_data(_SQL_DELETE_SOURCE, (source_name,),)
-
-
-async def upsert_ingest_source(source: ClientIngestSource) -> Box:
     return await db.write_data(
-        _SQL_REPLACE_SOURCE,
-        (source.name, source.uri, jsonpickle.dumps(source.meta)),
+        _SQL_DELETE_SOURCE,
+        (source_name,),
     )
 
 
-async def upsert_project(raw_project: Box) -> Box:
-    project = to_record(raw_project)
+@future_safe
+async def upsert_ingest_source(source: ClientIngestSource) -> Box:
+    return await db.write_data(
+        _SQL_REPLACE_SOURCE,
+        (
+            source.name,
+            source.uri,
+            jsonpickle.dumps(source.meta) if source.meta else None,
+        ),
+    )
+
+
+@future_safe
+async def upsert_project(project: ClientProject) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT,
         (

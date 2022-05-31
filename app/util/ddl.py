@@ -15,7 +15,7 @@ _SCRIPT = """
 CREATE TABLE IF NOT EXISTS provider_project (
     id INTEGER PRIMARY KEY NOT NULL, 
     name TEXT NOT NULL,
-    code TEXT NOT NULL
+    code TEXT
 );
 CREATE TABLE IF NOT EXISTS provider_file (
     id INTEGER PRIMARY KEY NOT NULL, 
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS client_project (
     origin_id INTEGER NOT NULL,
     source TEXT NOT NULL,
     name TEXT NOT NULL,
-    code TEXT NOT NULL,
+    code TEXT,
     PRIMARY KEY (id),
     CONSTRAINT fk_cis
         FOREIGN KEY (source) 
