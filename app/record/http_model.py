@@ -44,6 +44,10 @@ class VersionChangeHttpModel(BaseModel):
     status: str
     revision: str
     comment: str
+    processed: bool = False
+
+
+class UpdateVersionChangeHttpModel(BaseModel):
     processed: bool
 
 

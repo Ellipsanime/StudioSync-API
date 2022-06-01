@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS client_file (
     extension TEXT NOT NULL,
     path TEXT NOT NULL,
     PRIMARY KEY (id),
+    UNIQUE(version_change_id, origin_id),
     FOREIGN KEY (version_change_id) 
         REFERENCES client_version_change (id) 
 );
@@ -144,6 +145,7 @@ CREATE TABLE IF NOT EXISTS client_version_change (
     comment TEXT NOT NULL,
     processed INTEGER NOT NULL,
     PRIMARY KEY (id),
+    UNIQUE(project_id, origin_id),
     FOREIGN KEY (project_id)
         REFERENCES client_project (id) 
 );

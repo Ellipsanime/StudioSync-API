@@ -5,31 +5,67 @@ from returns.future import future_safe
 from returns.pipeline import flow
 
 from app.record.command import (
-    ReplaceIngestSourceCommand,
+    UpsertIngestSourceCommand,
     DeleteIngestSourceCommand,
-    ReplaceClientProjectCommand,
+    UpsertClientProjectCommand,
+    CreateVersionChangeCommand,
+    CreateFileCommand, UpdateVersionChangeCommand,
 )
-from app.record.dto import dto_from_attr, ClientIngestSource, ClientProject
+from app.record.dto import (
+    dto_from_attr,
+    ClientIngestSourceDto,
+    ClientProjectDto,
+    VersionChangeDto,
+)
 from app.writer import client_writer
 
 
 async def create_or_update_ingest_source(
-    command: ReplaceIngestSourceCommand,
+    command: UpsertIngestSourceCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientIngestSource),
+        dto_from_attr(ClientIngestSourceDto),
         client_writer.upsert_ingest_source,
     )
 
 
 async def create_or_update_project(
-    command: ReplaceClientProjectCommand,
+    command: UpsertClientProjectCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientProject),
+        dto_from_attr(ClientProjectDto),
         client_writer.upsert_project,
+    )
+
+
+async def create_version_change(
+    command: CreateVersionChangeCommand,
+) -> Any:
+    return await flow(
+        command,
+        dto_from_attr(VersionChangeDto),
+        client_writer.insert_version_change,
+    )
+
+
+async def update_version_change(
+    command: UpdateVersionChangeCommand,
+) -> Any:
+    return await flow(
+        command,
+        lambda x: client_writer.update_version_change(x.id, x.processed),
+    )
+
+
+async def create_file(
+    command: CreateFileCommand,
+) -> Any:
+    return await flow(
+        command,
+        dto_from_attr(ClientProjectDto),
+        client_writer.insert_file,
     )
 
 

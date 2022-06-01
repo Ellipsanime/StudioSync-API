@@ -11,14 +11,14 @@ class DeleteIngestSourceCommand:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ReplaceIngestSourceCommand:
+class UpsertIngestSourceCommand:
     name: str
     uri: str
     meta: Dict | None
 
     @staticmethod
-    def unbox(data: Box) -> "ReplaceIngestSourceCommand":
-        return ReplaceIngestSourceCommand(
+    def unbox(data: Box) -> "UpsertIngestSourceCommand":
+        return UpsertIngestSourceCommand(
             data.name,
             data.uri,
             data.meta or None,
@@ -26,7 +26,7 @@ class ReplaceIngestSourceCommand:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ReplaceClientProjectCommand:
+class UpsertClientProjectCommand:
     id: int | None
     origin_id: int
     source: str
@@ -34,8 +34,8 @@ class ReplaceClientProjectCommand:
     code: str | None
 
     @staticmethod
-    def unbox(data: Box) -> "ReplaceClientProjectCommand":
-        return ReplaceClientProjectCommand(
+    def unbox(data: Box) -> "UpsertClientProjectCommand":
+        return UpsertClientProjectCommand(
             data.id or None,
             data.origin_id,
             data.source,
@@ -45,17 +45,30 @@ class ReplaceClientProjectCommand:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class CreateProviderProjectCommand:
+class UpsertProviderProjectCommand:
     origin_id: int
     name: str
     code: str | None
 
     @staticmethod
-    def unbox(data: Box) -> "CreateProviderProjectCommand":
-        return CreateProviderProjectCommand(
+    def unbox(data: Box) -> "UpsertProviderProjectCommand":
+        return UpsertProviderProjectCommand(
             data.origin_id,
             data.name,
             data.code or None,
+        )
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class UpdateVersionChangeCommand:
+    id: int
+    processed: bool
+
+    @staticmethod
+    def unbox(data: Box) -> "UpdateVersionChangeCommand":
+        return UpdateVersionChangeCommand(
+            data.id,
+            data.processed,
         )
 
 
@@ -76,7 +89,7 @@ class CreateVersionChangeCommand:
     def unbox(data: Box) -> "CreateVersionChangeCommand":
         return CreateVersionChangeCommand(
             data.origin_id,
-            data.datetime,
+            data.datetime.timestamp(),
             data.project_id,
             data.entity_type,
             data.entity_name,
@@ -104,7 +117,7 @@ class CreateFileCommand:
         return CreateFileCommand(
             data.origin_id,
             data.code,
-            data.datetime,
+            data.datetime.timestamp(),
             data.version_change_id,
             data.task,
             data.element,
