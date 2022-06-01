@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Dict
 
 from box import Box
-from pydantic import BaseModel, AnyUrl
+from pydantic import BaseModel, AnyUrl, Field
 # from pydantic.json import Dict
 
 from app.util.data import boxify
@@ -10,6 +10,15 @@ from app.util.data import boxify
 
 def boxify_http_model(model: BaseModel) -> Box:
     return boxify(model.dict(exclude_unset=True))
+
+
+class SearchableQueryParams(BaseModel):
+    filter_field: str | None = Field(title="Filter field name")
+    filter_value: str | None = Field(title="Filter value")
+    sort_field: str | None = Field(title="Sort-by field value")
+    sort_order: int | None = Field(title="Sort-by order (1/-1)")
+    skip: int | None = Field(title="Count of rows to be skipped")
+    limit: int | None = Field(title="Amount of rows to return(max: 25)")
 
 
 class IngestSourceHttpModel(BaseModel):

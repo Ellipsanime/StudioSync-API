@@ -65,12 +65,14 @@ async def fetch_one(
         result = boxify(dict(zip(row.keys(), row)))
 
         await cursor.close()
-        await db.close()
 
         return result
     except Exception as ex:
         _LOG.exception(ex)
         raise ex
+    finally:
+        if db:
+            await db.close()
 
 
 async def fetch_all(
@@ -87,7 +89,6 @@ async def fetch_all(
         result = [boxify(dict(zip(x.keys(), x))) for x in rows]
 
         await cursor.close()
-        await db.close()
 
         return result
     except Exception as ex:

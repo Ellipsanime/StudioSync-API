@@ -25,7 +25,9 @@ from app.record.http_model import (
     FileHttpModel,
     boxify_http_model,
     UpdateVersionChangeHttpModel,
+    SearchableQueryParams,
 )
+from app.record.query import VersionChangeQuery
 from app.repo import client_repo
 from app.util.controller import process_result
 from app.util.data import boxify
@@ -37,8 +39,16 @@ router = APIRouter(tags=["client", "v1"], prefix="/v1/client")
 
 
 @router.get("/project/{project_id}/version_changes")
-async def version_changes(project_id: int) -> List[Box]:
-    return await client_repo.fetch_version_changes_per_project(project_id)
+async def version_changes(
+    project_id: int,
+    search_params: SearchableQueryParams = Depends(SearchableQueryParams),
+) -> List[Box]:
+    return await flow(
+        search_params,
+        boxify_http_model,
+        VersionChangeQuery.unbox(project_id),
+        client_repo.fetch_version_changes_per_project,
+    )
 
 
 @router.get("/projects")

@@ -4,21 +4,32 @@ from typing import List, Dict, Any
 
 from box import Box
 
+from app.record.query import VersionChangeQuery
 from app.util import db
 from app.util.data import boxify
 
 
 _SQL_GET_VERSION_VIEW = """
-SELECT * FROM client_version_file_view WHERE project_id = ?
+SELECT * FROM client_version_file_view WHERE project_id = ? AND ? = ? ORDER BY ?
 """
 _SQL_ALL_FILES = "SELECT * FROM client_file"
 _SQL_ALL_PROJECTS = "SELECT * FROM client_project"
-_SQL_ALL_VERSIONS = "SELECT * FROM client_version_change"
+_SQL_ALL_VERSION_CHANGES = "SELECT * FROM client_version_change"
 _SQL_ALL_SOURCES = "SELECT * FROM client_ingest_source"
 
 
-async def fetch_version_changes_per_project(project_id: int) -> List[Box]:
-    raw_changes = await db.fetch_all(_SQL_GET_VERSION_VIEW, (project_id,))
+async def fetch_version_changes_per_project(
+    query: VersionChangeQuery,
+) -> List[Box]:
+    raw_changes = await db.fetch_all(
+        _SQL_GET_VERSION_VIEW,
+        (
+            query.project_id,
+            query.field,
+            query.value,
+            f"{query.sort_field} {query.sort_order}",
+        ),
+    )
     return [
         _map_group(list(g))
         for _, g in groupby(raw_changes, lambda x: x.version_id)
@@ -31,7 +42,7 @@ async def fetch_projects() -> List[Box]:
 
 
 async def fetch_version_changes() -> List[Box]:
-    version_change = await db.fetch_all(_SQL_ALL_VERSIONS)
+    version_change = await db.fetch_all(_SQL_ALL_VERSION_CHANGES)
     return [_convert_datetime(x) for x in version_change]
 
 
@@ -48,10 +59,7 @@ async def fetch_ingest_sources() -> List[Box]:
 def _convert_datetime(entity: Box | Dict, field: Any = "datetime") -> Box:
     if field not in entity:
         return entity
-    return boxify({
-        **entity,
-        field: datetime.fromtimestamp(entity[field])
-    })
+    return boxify({**entity, field: datetime.fromtimestamp(entity[field])})
 
 
 def _get_subdict(entity: Dict[str, Any], key: str) -> Dict[str, Any]:
@@ -62,7 +70,9 @@ def _get_subdict(entity: Dict[str, Any], key: str) -> Dict[str, Any]:
 
 def _map_group(group: List[Box]) -> Box:
     version = _convert_datetime(_get_subdict(group[0], "version_"))
-    linked_files = [_convert_datetime(_get_subdict(x, "file_")) for x in group]
+    linked_files = [
+        _convert_datetime(_get_subdict(x, "file_")) for x in group if x.file_id
+    ]
     return boxify(
         {
             **version,
@@ -70,5 +80,3 @@ def _map_group(group: List[Box]) -> Box:
             "linked_files": linked_files,
         }
     )
-
-
