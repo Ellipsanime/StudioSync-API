@@ -4,31 +4,68 @@ from typing import List, Dict, Any
 
 from box import Box
 
+from app.record.enumeration import SearchableVersionChangeField
 from app.record.query import VersionChangeQuery
 from app.util import db
 from app.util.data import boxify
 
 
-_SQL_GET_VERSION_VIEW = """
-SELECT * FROM client_version_file_view WHERE project_id = ? AND ? = ? ORDER BY ?
-"""
+_SQL_GET_VERSION_VIEW = {
+    None: """
+        SELECT * FROM client_version_file_view
+        WHERE project_id = ? 
+        ORDER BY ? DESC
+        LIMIT ? OFFSET ?
+    """,
+    **{
+        x.value: f"""
+            SELECT * FROM client_version_file_view
+            WHERE project_id = ? AND {x.value} = ? 
+            ORDER BY ? DESC
+            LIMIT ? OFFSET ?
+        """
+        for x in list(SearchableVersionChangeField)
+    },
+}
 _SQL_ALL_FILES = "SELECT * FROM client_file"
 _SQL_ALL_PROJECTS = "SELECT * FROM client_project"
 _SQL_ALL_VERSION_CHANGES = "SELECT * FROM client_version_change"
 _SQL_ALL_SOURCES = "SELECT * FROM client_ingest_source"
 
 
+def _get_version_change_view_sql(query: VersionChangeQuery) -> str:
+    if query.value is None:
+        return f"""
+            SELECT * FROM client_version_file_view
+            WHERE project_id = ? 
+            ORDER BY {query.sort_field} {query.sort_order}
+            LIMIT ? OFFSET ?
+        """
+
+    return f"""
+        SELECT * FROM client_version_file_view
+        WHERE project_id = ? AND {query.field} = ? 
+        ORDER BY {query.sort_field} {query.sort_order}
+        LIMIT ? OFFSET ?
+    """
+
+
 async def fetch_version_changes_per_project(
     query: VersionChangeQuery,
 ) -> List[Box]:
-    raw_changes = await db.fetch_all(
-        _SQL_GET_VERSION_VIEW,
-        (
+    params = tuple(
+        x
+        for x in [
             query.project_id,
-            query.field,
             query.value,
-            f"{query.sort_field} {query.sort_order}",
-        ),
+            query.limit,
+            query.skip,
+        ]
+        if x is not None
+    )
+    raw_changes = await db.fetch_all(
+        _get_version_change_view_sql(query),
+        params,
     )
     return [
         _map_group(list(g))

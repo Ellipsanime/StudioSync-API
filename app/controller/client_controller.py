@@ -25,7 +25,7 @@ from app.record.http_model import (
     FileHttpModel,
     boxify_http_model,
     UpdateVersionChangeHttpModel,
-    SearchableQueryParams,
+    VersionChangeQueryParams,
 )
 from app.record.query import VersionChangeQuery
 from app.repo import client_repo
@@ -35,13 +35,13 @@ from app.util.logger import get_logger
 
 _LOG = get_logger(__name__.split(".")[-1])
 
-router = APIRouter(tags=["client", "v1"], prefix="/v1/client")
+router = APIRouter(tags=["client-v1"], prefix="/v1/client")
 
 
 @router.get("/project/{project_id}/version_changes")
 async def version_changes(
     project_id: int,
-    search_params: SearchableQueryParams = Depends(SearchableQueryParams),
+    search_params: VersionChangeQueryParams = Depends(VersionChangeQueryParams),
 ) -> List[Box]:
     return await flow(
         search_params,

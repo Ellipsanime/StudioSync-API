@@ -8,9 +8,9 @@ from returns.curry import curry
 @attr.s(auto_attribs=True, frozen=True)
 class VersionChangeQuery:
     project_id: int
-    field: str = "1"
-    value: Any = "1"
-    sort_field: str = "id"
+    field: str | None
+    value: Any | None
+    sort_field: str = "version_id"
     sort_order: str = "ASC"
     skip: int = 0
     limit: int = 500
@@ -20,10 +20,10 @@ class VersionChangeQuery:
     def unbox(project_id: int, data: Box) -> "VersionChangeQuery":
         return VersionChangeQuery(
             project_id,
-            data.filter_field or "1",
-            data.filter_value or "1",
-            data.sort_field or "id",
-            data.sort_order or "ASC",
+            data.filter_field.value if data.filter_field else None,
+            data.filter_value or None,
+            data.sort_field.value,
+            data.sort_order.value,
             data.skip or 0,
             data.limit or 500,
         )
