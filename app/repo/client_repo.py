@@ -10,23 +10,6 @@ from app.util import db
 from app.util.data import boxify
 
 
-_SQL_GET_VERSION_VIEW = {
-    None: """
-        SELECT * FROM client_version_file_view
-        WHERE project_id = ? 
-        ORDER BY ? DESC
-        LIMIT ? OFFSET ?
-    """,
-    **{
-        x.value: f"""
-            SELECT * FROM client_version_file_view
-            WHERE project_id = ? AND {x.value} = ? 
-            ORDER BY ? DESC
-            LIMIT ? OFFSET ?
-        """
-        for x in list(SearchableVersionChangeField)
-    },
-}
 _SQL_ALL_FILES = "SELECT * FROM client_file"
 _SQL_ALL_PROJECTS = "SELECT * FROM client_project"
 _SQL_ALL_VERSION_CHANGES = "SELECT * FROM client_version_change"

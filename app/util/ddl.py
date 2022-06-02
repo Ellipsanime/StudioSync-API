@@ -101,7 +101,7 @@ AS
     FROM provider_version_change pvc
              INNER JOIN provider_project pp ON (pp.id = pvc.project_id)
              LEFT OUTER JOIN provider_file pf
-                             ON (pvc.id = plf.version_change_id);
+                             ON (pvc.id = pf.version_change_id);
 
 ------------------------------------
 --------------  CLIENT  ------------

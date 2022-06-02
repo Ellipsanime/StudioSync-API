@@ -12,7 +12,7 @@ from app.util.logger import get_logger
 
 _LOG = get_logger(__name__.split(".")[-1])
 
-router = APIRouter(tags=["provider", "v1"], prefix="/v1/provider")
+router = APIRouter(tags=["provider-v1"], prefix="/v1/provider")
 
 
 @router.get("/project/{project_id}/version_changes")

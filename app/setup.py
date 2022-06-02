@@ -8,6 +8,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.controller import metadata_controller as meta
 from app.controller import client_controller as client
+from app.controller import provider_controller as provider
 from app.domain import sync_domain
 from app.util import ddl
 from app.util.logger import get_logger
@@ -35,6 +36,7 @@ def _setup_app() -> FastAPI:
     app = FastAPI(**{})
     app.include_router(meta.router)
     app.include_router(client.router)
+    app.include_router(provider.router)
     return app
 
 
