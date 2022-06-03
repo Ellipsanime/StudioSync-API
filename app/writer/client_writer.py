@@ -5,14 +5,18 @@ from box import Box
 from returns.future import future_safe
 from returns.result import safe
 
-from app.record.dto import ClientIngestSourceDto, ClientProjectDto, FileDto, \
-    VersionChangeDto
+from app.record.dto import (
+    ClientProjectDto,
+    ClientProjectSplitDto,
+    FileDto,
+    VersionChangeDto,
+)
 from app.util import db
 from app.util.data import to_record, boxify
 
-_SQL_REPLACE_PROJECT = """
-REPLACE INTO client_project (id, source, name, code, origin_id)
-VALUES (?, ?, ?, ?, ?)
+_SQL_REPLACE_PROJECT_SPLIT = """
+REPLACE INTO client_project_split (id, name, origin_id, project_id)
+VALUES (?, ?, ?, ?)
 """
 
 _SQL_INSERT_FILE = """
@@ -28,14 +32,14 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_INSERT_VERSION_CHANGE = """
-INSERT INTO client_version_change (id, datetime, project_id,
+INSERT INTO client_version_change (id, datetime, project_split_id,
                                     entity_type, entity_name, task, status,
                                     revision, comment, processed, origin_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_REPLACE_VERSION_CHANGE = """
-REPLACE INTO client_version_change (id, datetime, project_id,
+REPLACE INTO client_version_change (id, datetime, project_split_id,
                                     entity_type, entity_name, task, status,
                                     revision, comment, processed, origin_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -47,33 +51,21 @@ SET processed = ?
 WHERE id = ?
 """
 
-_SQL_REPLACE_SOURCE = """
-REPLACE INTO client_ingest_source (name, uri, meta)
-VALUES (?, ?, ?)
+_SQL_REPLACE_PROJECT = """
+REPLACE INTO client_project (id, name, code, uri, meta)
+VALUES (?, ?, ?, ?, ?)
 """
 
-_SQL_DELETE_SOURCE = """
-DELETE FROM client_ingest_source WHERE name = ?
+_SQL_DELETE_PROJECT = """
+DELETE FROM client_project WHERE id = ?
 """
 
 
 @future_safe
-async def remove_ingest_source(source_name: str) -> Box:
+async def remove_project(id_: int) -> Box:
     return await db.write_data(
-        _SQL_DELETE_SOURCE,
-        (source_name,),
-    )
-
-
-@future_safe
-async def upsert_ingest_source(source: ClientIngestSourceDto) -> Box:
-    return await db.write_data(
-        _SQL_REPLACE_SOURCE,
-        (
-            source.name,
-            source.uri,
-            jsonpickle.dumps(source.meta) if source.meta else None,
-        ),
+        _SQL_DELETE_PROJECT,
+        (id_,),
     )
 
 
@@ -82,11 +74,24 @@ async def upsert_project(project: ClientProjectDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT,
         (
-            project.id,
-            project.source,
+            project.id or None,
             project.name,
             project.code,
-            project.origin_id,
+            project.uri,
+            jsonpickle.dumps(project.meta) if project.meta else None,
+        ),
+    )
+
+
+@future_safe
+async def upsert_project_split(project_split: ClientProjectSplitDto) -> Box:
+    return await db.write_data(
+        _SQL_REPLACE_PROJECT_SPLIT,
+        (
+            project_split.id or None,
+            project_split.name,
+            project_split.origin_id,
+            project_split.project_id,
         ),
     )
 
@@ -129,7 +134,10 @@ async def upsert_file(file: FileDto) -> Box:
 
 @future_safe
 async def update_version_change(id_: int, processed: bool) -> Box:
-    return await db.write_data(_SQL_UPDATE_VERSION_CHANGE, (id_, processed))
+    return await db.write_data(
+        _SQL_UPDATE_VERSION_CHANGE,
+        (processed, id_),
+    )
 
 
 @future_safe
@@ -139,7 +147,7 @@ async def upsert_version_change(version_change: VersionChangeDto) -> Box:
         (
             version_change.id,
             version_change.datetime,
-            version_change.project_id,
+            version_change.project_split_id,
             version_change.entity_type,
             version_change.entity_name,
             version_change.task,
@@ -159,7 +167,7 @@ async def insert_version_change(version_change: VersionChangeDto) -> Box:
         (
             None,
             version_change.datetime,
-            version_change.project_id,
+            version_change.project_split_id,
             version_change.entity_type,
             version_change.entity_name,
             version_change.task,

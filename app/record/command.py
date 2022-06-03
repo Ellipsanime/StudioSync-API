@@ -6,41 +6,43 @@ from datetime import datetime
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class DeleteIngestSourceCommand:
-    source_name: str
+class RemoveProjectCommand:
+    project_id: int
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertIngestSourceCommand:
+class UpsertClientProjectCommand:
+    id: int | None
     name: str
+    code: str
     uri: str
     meta: Dict | None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertIngestSourceCommand":
-        return UpsertIngestSourceCommand(
+    def unbox(data: Box) -> "UpsertClientProjectCommand":
+        return UpsertClientProjectCommand(
+            data.id or None,
             data.name,
+            data.code,
             data.uri,
             data.meta or None,
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertClientProjectCommand:
+class UpsertClientProjectSplitCommand:
     id: int | None
     origin_id: int
-    source: str
+    project_id: int
     name: str
-    code: str | None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertClientProjectCommand":
-        return UpsertClientProjectCommand(
+    def unbox(data: Box) -> "UpsertClientProjectSplitCommand":
+        return UpsertClientProjectSplitCommand(
             data.id or None,
             data.origin_id,
-            data.source,
+            data.project_id,
             data.name,
-            data.code or None,
         )
 
 
@@ -76,7 +78,7 @@ class UpdateVersionChangeCommand:
 class CreateVersionChangeCommand:
     origin_id: int
     datetime: datetime
-    project_id: int
+    project_split_id: int
     entity_type: str
     entity_name: str
     task: str
@@ -90,7 +92,7 @@ class CreateVersionChangeCommand:
         return CreateVersionChangeCommand(
             data.origin_id,
             data.datetime.timestamp(),
-            data.project_id,
+            data.project_split_id,
             data.entity_type,
             data.entity_name,
             data.task,

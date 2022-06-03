@@ -1,33 +1,22 @@
 from typing import Any
 
 from box import Box
-from returns.future import future_safe
 from returns.pipeline import flow
 
 from app.record.command import (
-    UpsertIngestSourceCommand,
-    DeleteIngestSourceCommand,
     UpsertClientProjectCommand,
+    RemoveProjectCommand,
+    UpsertClientProjectSplitCommand,
     CreateVersionChangeCommand,
     CreateFileCommand, UpdateVersionChangeCommand,
 )
 from app.record.dto import (
     dto_from_attr,
-    ClientIngestSourceDto,
     ClientProjectDto,
+    ClientProjectSplitDto,
     VersionChangeDto,
 )
 from app.writer import client_writer
-
-
-async def create_or_update_ingest_source(
-    command: UpsertIngestSourceCommand,
-) -> Any:
-    return await flow(
-        command,
-        dto_from_attr(ClientIngestSourceDto),
-        client_writer.upsert_ingest_source,
-    )
 
 
 async def create_or_update_project(
@@ -37,6 +26,16 @@ async def create_or_update_project(
         command,
         dto_from_attr(ClientProjectDto),
         client_writer.upsert_project,
+    )
+
+
+async def create_or_update_project_split(
+    command: UpsertClientProjectSplitCommand,
+) -> Any:
+    return await flow(
+        command,
+        dto_from_attr(ClientProjectSplitDto),
+        client_writer.upsert_project_split,
     )
 
 
@@ -64,10 +63,10 @@ async def create_file(
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientProjectDto),
+        dto_from_attr(ClientProjectSplitDto),
         client_writer.insert_file,
     )
 
 
-async def remove_ingest_source(command: DeleteIngestSourceCommand) -> Box:
-    return await client_writer.remove_ingest_source(command.source_name)
+async def remove_project(command: RemoveProjectCommand) -> Box:
+    return await client_writer.remove_project(command.project_id)

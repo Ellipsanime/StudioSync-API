@@ -7,24 +7,24 @@ from returns.pipeline import flow
 
 from app.domain import client_domain
 from app.domain.client_domain import (
-    create_or_update_ingest_source,
     create_or_update_project,
+    create_or_update_project_split,
 )
 from app.record.command import (
+    UpsertClientProjectSplitCommand,
     UpsertClientProjectCommand,
-    UpsertIngestSourceCommand,
-    DeleteIngestSourceCommand,
+    RemoveProjectCommand,
     CreateVersionChangeCommand,
     CreateFileCommand,
     UpdateVersionChangeCommand,
 )
 from app.record.http_model import (
-    ClientProjectHttpModel,
-    VersionChangeHttpModel,
-    IngestSourceHttpModel,
-    FileHttpModel,
-    boxify_http_model,
-    UpdateVersionChangeHttpModel,
+    ClientProjectSplitParams,
+    VersionChangeParams,
+    ClientProjectParams,
+    FileParams,
+    boxify_params,
+    UpdateVersionChangeParams,
     VersionChangeQueryParams,
 )
 from app.record.query import VersionChangeQuery
@@ -38,15 +38,15 @@ _LOG = get_logger(__name__.split(".")[-1])
 router = APIRouter(tags=["client-v1"], prefix="/v1/client")
 
 
-@router.get("/project/{project_id}/version_changes")
-async def version_changes(
-    project_id: int,
+@router.get("/project/{project_name}/version-changes")
+async def version_changes_by_project_name(
+    project_name: str,
     search_params: VersionChangeQueryParams = Depends(VersionChangeQueryParams),
 ) -> List[Box]:
     return await flow(
         search_params,
-        boxify_http_model,
-        VersionChangeQuery.unbox(project_id),
+        boxify_params,
+        VersionChangeQuery.unbox(project_name),
         client_repo.fetch_version_changes_per_project,
     )
 
@@ -56,81 +56,85 @@ async def projects() -> List[Box]:
     return await client_repo.fetch_projects()
 
 
-@router.get("/version_changes")
+@router.get("/projects-splits")
+async def projects() -> List[Box]:
+    return await client_repo.fetch_project_splits()
+
+
+@router.get("/version-changes")
 async def version_changes() -> List[Box]:
     return await client_repo.fetch_version_changes()
 
 
-@router.post("/project")
-async def upsert_project(
-    project_model: ClientProjectHttpModel,
+@router.post("/project-split")
+async def upsert_project_split(
+    project_model: ClientProjectSplitParams,
 ) -> Any:
     return await flow(
         project_model,
-        boxify_http_model,
-        UpsertClientProjectCommand.unbox,
-        create_or_update_project,
+        boxify_params,
+        UpsertClientProjectSplitCommand.unbox,
+        create_or_update_project_split,
         process_result,
     )
 
 
-@router.post("/version_change")
+@router.post("/version-change")
 async def create_version_change(
-    version_change_model: VersionChangeHttpModel,
+    version_change_model: VersionChangeParams,
 ) -> Any:
     return await flow(
         version_change_model,
-        boxify_http_model,
+        boxify_params,
         CreateVersionChangeCommand.unbox,
         client_domain.create_version_change,
         process_result,
     )
 
 
-@router.post("/ingest_source")
-async def upsert_ingest_source(
-    ingest_source_model: IngestSourceHttpModel,
+@router.post("/project")
+async def upsert_project(
+    project_model: ClientProjectParams,
 ) -> Any:
     return await flow(
-        ingest_source_model,
-        boxify_http_model,
-        UpsertIngestSourceCommand.unbox,
-        create_or_update_ingest_source,
+        project_model,
+        boxify_params,
+        UpsertClientProjectCommand.unbox,
+        create_or_update_project,
         process_result,
     )
 
 
-@router.delete("/{source_name}/ingest_source")
-async def remove_ingest_source(source_name: str) -> Any:
+@router.delete("/{id}/project")
+async def remove_project(project_id: int) -> Any:
     return await flow(
-        source_name,
-        urllib.parse.unquote,
-        DeleteIngestSourceCommand,
-        client_domain.remove_ingest_source,
+        project_id,
+        RemoveProjectCommand,
+        client_domain.remove_project,
         process_result,
     )
 
 
 @router.post("/file")
-async def create_file(file_model: FileHttpModel) -> Any:
+async def create_file(file_model: FileParams) -> Any:
     return await flow(
         file_model,
-        boxify_http_model,
+        boxify_params,
         CreateFileCommand.unbox,
         client_domain.create_file,
         process_result,
     )
 
 
-@router.put("/{version_change_id}/version_change")
+@router.put("/{id_}/version-change")
 async def update_version_change(
-    version_change_id: int,
-    update_model: UpdateVersionChangeHttpModel,
+    id_: int,
+    update_model: UpdateVersionChangeParams,
 ) -> Any:
     return await flow(
         {
-            **boxify_http_model(update_model),
-            "version_change_id": version_change_id,
+            **boxify_params(update_model),
+            "id": id_,
         },
         boxify,
         UpdateVersionChangeCommand.unbox,

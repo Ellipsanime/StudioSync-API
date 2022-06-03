@@ -4,7 +4,7 @@ from app.util import db
 from app.util.data import to_record
 
 _SQL_REPLACE_PROJECT = """
-REPLACE INTO provider_project (id, title, code)
+REPLACE INTO provider_project_split (id, title, code)
 VALUES (?, ?, ?)
 """
 

@@ -11,30 +11,27 @@ def dto_from_attr(ctor: Type, data: Any) -> Type:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ClientIngestSourceDto:
+class ClientProjectDto:
+    id: int | None
     name: str
+    code: str
     uri: str
     meta: Dict | None
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ProjectDto:
+class ClientProjectSplitDto:
     id: int | None
+    project_id: int
     origin_id: int
     name: str
-    code: str | None
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class ClientProjectDto(ProjectDto):
-    source: str
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class VersionChangeDto:
     origin_id: int
     datetime: datetime
-    project_id: int
+    project_split_id: int
     entity_type: str
     entity_name: str
     task: str

@@ -4,9 +4,9 @@ from box import Box
 from fastapi import APIRouter
 
 from app.record.http_model import (
-    ProviderProjectHttpModel,
-    VersionChangeHttpModel,
-    FileHttpModel,
+    ProviderProjectParams,
+    VersionChangeParams,
+    FileParams,
 )
 from app.util.logger import get_logger
 
@@ -32,18 +32,18 @@ async def version_changes() -> List[Box]:
 
 @router.post("/project")
 async def upsert_project(
-    project_model: ProviderProjectHttpModel,
+    project_model: ProviderProjectParams,
 ) -> Any:
     return
 
 
 @router.post("/version_change")
 async def create_version_change(
-    version_change_model: VersionChangeHttpModel,
+    version_change_model: VersionChangeParams,
 ) -> Any:
     return
 
 
 @router.post("/file")
-async def create_file(file_model: FileHttpModel) -> Any:
+async def create_file(file_model: FileParams) -> Any:
     return

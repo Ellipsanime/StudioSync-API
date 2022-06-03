@@ -1,3 +1,4 @@
+import urllib.parse
 from typing import Any
 
 import attr
@@ -7,7 +8,7 @@ from returns.curry import curry
 
 @attr.s(auto_attribs=True, frozen=True)
 class VersionChangeQuery:
-    project_id: int
+    identifier: int | str
     field: str | None
     value: Any | None
     sort_field: str = "version_id"
@@ -17,9 +18,9 @@ class VersionChangeQuery:
 
     @staticmethod
     @curry
-    def unbox(project_id: int, data: Box) -> "VersionChangeQuery":
+    def unbox(identifier: int | str, data: Box) -> "VersionChangeQuery":
         return VersionChangeQuery(
-            project_id,
+            urllib.parse.unquote(identifier),
             data.filter_field.value if data.filter_field else None,
             data.filter_value or None,
             data.sort_field.value,

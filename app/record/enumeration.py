@@ -17,6 +17,7 @@ class SearchableVersionChangeField(Enum):
     VERSION_REVISION = "version_revision"
     VERSION_PROCESSED = "version_processed"
     VERSION_COMMENT = "version_comment"
+    PROJECT_SPLIT_NAME = "project_split_name"
     FILE_ID = "file_id"
     FILE_ORIGIN_ID = "file_origin_id"
     FILE_CODE = "file_code"

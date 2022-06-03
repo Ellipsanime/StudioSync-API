@@ -5,8 +5,8 @@ from mimesis import Generic
 from mimesis.enums import Locale
 
 from app.record.dto import (
-    ClientIngestSourceDto,
     ClientProjectDto,
+    ClientProjectSplitDto,
     VersionChangeDto,
     FileDto,
 )
@@ -14,10 +14,12 @@ from app.record.dto import (
 _R = Generic(locale=Locale.DE)
 
 
-def generate_client_source(num: int = 5) -> List[ClientIngestSourceDto]:
+def generate_client_project(num: int = 5) -> List[ClientProjectDto]:
     return [
-        ClientIngestSourceDto(
-            f"source_{_R.person.identifier()}_{x}",
+        ClientProjectDto(
+            x,
+            f"project_{_R.person.identifier()}_{x}",
+            _R.person.identifier().split("/")[0],
             _R.internet.uri(),
             {"key": f"{_R.person.full_name()} {_R.person.university()}"},
         )
@@ -25,23 +27,22 @@ def generate_client_source(num: int = 5) -> List[ClientIngestSourceDto]:
     ]
 
 
-def generate_client_projects(
-    source: str, num: int = 5
-) -> List[ClientProjectDto]:
+def generate_client_project_splits(
+    project_id: int, num: int = 5
+) -> List[ClientProjectSplitDto]:
     return [
-        ClientProjectDto(
+        ClientProjectSplitDto(
             id=x,
             origin_id=_R.numeric.increment(),
-            source=source,
+            project_id=project_id,
             name=f"{_R.person.full_name()} {_R.person.university()}",
-            code=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]
 
 
 def generate_client_version_changes(
-    project_id: int,
+    project_split_id: int,
     num: int = 5,
 ) -> List[VersionChangeDto]:
     return [
@@ -49,7 +50,7 @@ def generate_client_version_changes(
             id=x,
             origin_id=_R.numeric.increment(),
             datetime=_R.datetime.datetime().timestamp(),
-            project_id=project_id,
+            project_split_id=project_split_id,
             entity_type=_R.address.country_code(),
             entity_name=_R.person.surname(),
             task=_R.person.surname(),

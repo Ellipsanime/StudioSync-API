@@ -12,10 +12,9 @@ _SCRIPT = """
 ------------------------------------
 -------------- PROVIDER ------------
 ------------------------------------
-CREATE TABLE IF NOT EXISTS provider_project (
+CREATE TABLE IF NOT EXISTS provider_project_split (
     id INTEGER PRIMARY KEY NOT NULL, 
-    name TEXT NOT NULL,
-    code TEXT
+    name TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS provider_file (
     id INTEGER PRIMARY KEY NOT NULL, 
@@ -43,11 +42,11 @@ CREATE TABLE IF NOT EXISTS provider_version_change (
     comment TEXT NOT NULL,
     CONSTRAINT fk_pp
         FOREIGN KEY (project_id) 
-        REFERENCES provider_project (id) 
+        REFERENCES provider_project_split (id) 
 );
 
 CREATE TRIGGER IF NOT EXISTS UndeleteProviderProjects 
-BEFORE DELETE ON provider_project
+BEFORE DELETE ON provider_project_split
 FOR EACH ROW
 WHEN EXISTS (
   SELECT 1 
@@ -99,23 +98,22 @@ AS
            pf.extension as file_extension,
            pf.path as file_path
     FROM provider_version_change pvc
-             INNER JOIN provider_project pp ON (pp.id = pvc.project_id)
+             INNER JOIN provider_project_split pp ON (pp.id = pvc.project_id)
              LEFT OUTER JOIN provider_file pf
                              ON (pvc.id = pf.version_change_id);
 
 ------------------------------------
 --------------  CLIENT  ------------
 ------------------------------------
-CREATE TABLE IF NOT EXISTS client_project (
+CREATE TABLE IF NOT EXISTS client_project_split (
     id INTEGER NOT NULL,
     origin_id INTEGER NOT NULL,
-    source TEXT NOT NULL,
+    project_id INTEGER NOT NULL,
     name TEXT NOT NULL,
-    code TEXT,
     PRIMARY KEY (id),
     CONSTRAINT fk_cis
-        FOREIGN KEY (source) 
-        REFERENCES client_ingest_source (name)
+        FOREIGN KEY (project_id) 
+        REFERENCES client_project (id)
 );
 CREATE TABLE IF NOT EXISTS client_file (
     id INTEGER NOT NULL, 
@@ -136,7 +134,7 @@ CREATE TABLE IF NOT EXISTS client_version_change (
     id INTEGER NOT NULL,
     origin_id INTEGER NOT NULL,
     datetime INTEGER NOT NULL,
-    project_id INTEGER NOT NULL,
+    project_split_id INTEGER NOT NULL,
     entity_type TEXT NOT NULL,
     entity_name TEXT NOT NULL,
     task TEXT NOT NULL,
@@ -145,46 +143,49 @@ CREATE TABLE IF NOT EXISTS client_version_change (
     comment TEXT NOT NULL,
     processed INTEGER NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE(project_id, origin_id),
-    FOREIGN KEY (project_id)
-        REFERENCES client_project (id) 
+    UNIQUE(project_split_id, origin_id),
+    FOREIGN KEY (project_split_id)
+        REFERENCES client_project_split (id) 
 );
 
-CREATE TABLE IF NOT EXISTS client_ingest_source (
-    name TEXT PRIMARY KEY NOT NULL,
+CREATE TABLE IF NOT EXISTS client_project (
+    id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
     uri TEXT NOT NULL,
-    meta TEXT
+    meta TEXT,
+    PRIMARY KEY (id)
 );
 
-CREATE TRIGGER IF NOT EXISTS UndeleteClientIngestSource 
-BEFORE DELETE ON client_ingest_source
-FOR EACH ROW
-WHEN EXISTS (
-  SELECT 1 
-  FROM client_project cp
-  WHERE cp.source = OLD.name
-)
-BEGIN      
-  SELECT 
-    RAISE(
-        ABORT,
-        'Can not delete ingest source when it still has related projects'
-    ); 
-END;
-
-CREATE TRIGGER IF NOT EXISTS UndeleteClientProjects 
+CREATE TRIGGER IF NOT EXISTS UndeleteClientProject 
 BEFORE DELETE ON client_project
 FOR EACH ROW
 WHEN EXISTS (
   SELECT 1 
-  FROM client_version_change cvc
-  WHERE cvc.project_id = OLD.id
+  FROM client_project_split cp
+  WHERE cp.project_id = OLD.id
 )
 BEGIN      
   SELECT 
     RAISE(
         ABORT,
-        'Can not delete project when it still has related version changes'
+        'Can not delete project when it still has related project splits'
+    ); 
+END;
+
+CREATE TRIGGER IF NOT EXISTS UndeleteClientProjectSplit
+BEFORE DELETE ON client_project_split
+FOR EACH ROW
+WHEN EXISTS (
+  SELECT 1 
+  FROM client_version_change cvc
+  WHERE cvc.project_split_id = OLD.id
+)
+BEGIN      
+  SELECT 
+    RAISE(
+        ABORT,
+        'Can not delete project split when it still has related version changes'
     ); 
 END;
 
@@ -210,9 +211,11 @@ AS
            pvc.id as version_id,
            pvc.origin_id as version_origin_id,
            pvc.datetime as version_datetime,
-           pp.source as version_source,
-           pp.id as project_id,
-           pp.name as project_name,
+           cps.id as project_split_id,
+           cps.name as project_split_name,
+           cp.code as project_code,
+           cp.name as project_name,
+           cp.id as project_id,
            pvc.task as version_task,
            pvc.entity_type as version_entity_type,
            pvc.entity_name as version_entity_name,
@@ -229,9 +232,12 @@ AS
            pf.extension as file_extension,
            pf.path as file_path
     FROM client_version_change pvc
-             INNER JOIN client_project pp ON (pp.id = pvc.project_id)
+             INNER JOIN client_project_split cps 
+                ON (cps.id = pvc.project_split_id)
+             INNER JOIN client_project cp
+                ON (cp.id = cps.project_id)
              LEFT OUTER JOIN client_file pf
-                             ON (pf.version_change_id = pvc.id);
+                ON (pf.version_change_id = pvc.id);
 """
 
 

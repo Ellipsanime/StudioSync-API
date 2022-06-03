@@ -12,7 +12,7 @@ from app.record.enumeration import (
 from app.util.data import boxify
 
 
-def boxify_http_model(model: BaseModel) -> Box:
+def boxify_params(model: BaseModel) -> Box:
     return boxify(model.dict(exclude_unset=True))
 
 
@@ -29,32 +29,31 @@ class VersionChangeQueryParams(BaseModel):
     limit: int = Field(500, title="Amount of rows to return(max: 25)")
 
 
-class IngestSourceHttpModel(BaseModel):
+class ClientProjectParams(BaseModel):
+    id: int | None
     name: str
+    code: str
     uri: AnyUrl
     meta: Dict | None
 
 
-class ClientProjectHttpModel(BaseModel):
+class ClientProjectSplitParams(BaseModel):
     id: int | None
     origin_id: int
-    source: str
+    project_id: int
     name: str
-    code: str | None
 
 
-class ProviderProjectHttpModel(BaseModel):
+class ProviderProjectParams(BaseModel):
     id: int | None
-    origin_id: int
     name: str
-    code: str | None
 
 
-class VersionChangeHttpModel(BaseModel):
+class VersionChangeParams(BaseModel):
     id: int | None
     origin_id: int
     datetime: datetime
-    project_id: int
+    project_split_id: int
     entity_type: str
     entity_name: str
     task: str
@@ -64,11 +63,11 @@ class VersionChangeHttpModel(BaseModel):
     processed: bool = False
 
 
-class UpdateVersionChangeHttpModel(BaseModel):
+class UpdateVersionChangeParams(BaseModel):
     processed: bool
 
 
-class FileHttpModel(BaseModel):
+class FileParams(BaseModel):
     id: int | None
     origin_id: int
     code: str
