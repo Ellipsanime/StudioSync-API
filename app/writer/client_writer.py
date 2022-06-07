@@ -8,15 +8,15 @@ from returns.result import safe
 from app.record.dto import (
     ClientProjectDto,
     ClientProjectSplitDto,
-    FileDto,
-    VersionChangeDto,
+    ClientFileDto,
+    ClientVersionChangeDto,
 )
 from app.util import db
 from app.util.data import to_record, boxify
 
 _SQL_REPLACE_PROJECT_SPLIT = """
-REPLACE INTO client_project_split (id, name, origin_id, project_id)
-VALUES (?, ?, ?, ?)
+REPLACE INTO client_project_split (id, name, origin_id, project_id, uri, meta)
+VALUES (?, ?, ?, ?, ?, ?)
 """
 
 _SQL_INSERT_FILE = """
@@ -52,8 +52,8 @@ WHERE id = ?
 """
 
 _SQL_REPLACE_PROJECT = """
-REPLACE INTO client_project (id, name, code, uri, meta)
-VALUES (?, ?, ?, ?, ?)
+REPLACE INTO client_project (id, name, code)
+VALUES (?, ?, ?)
 """
 
 _SQL_DELETE_PROJECT = """
@@ -77,8 +77,6 @@ async def upsert_project(project: ClientProjectDto) -> Box:
             project.id or None,
             project.name,
             project.code,
-            project.uri,
-            jsonpickle.dumps(project.meta) if project.meta else None,
         ),
     )
 
@@ -92,12 +90,14 @@ async def upsert_project_split(project_split: ClientProjectSplitDto) -> Box:
             project_split.name,
             project_split.origin_id,
             project_split.project_id,
+            project_split.uri,
+            jsonpickle.dumps(project_split.meta) if project_split.meta else None,
         ),
     )
 
 
 @future_safe
-async def insert_file(file: FileDto) -> Box:
+async def insert_file(file: ClientFileDto) -> Box:
     return await db.write_data(
         _SQL_INSERT_FILE,
         (
@@ -115,7 +115,7 @@ async def insert_file(file: FileDto) -> Box:
 
 
 @future_safe
-async def upsert_file(file: FileDto) -> Box:
+async def upsert_file(file: ClientFileDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_FILE,
         (
@@ -141,7 +141,7 @@ async def update_version_change(id_: int, processed: bool) -> Box:
 
 
 @future_safe
-async def upsert_version_change(version_change: VersionChangeDto) -> Box:
+async def upsert_version_change(version_change: ClientVersionChangeDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_VERSION_CHANGE,
         (
@@ -161,7 +161,7 @@ async def upsert_version_change(version_change: VersionChangeDto) -> Box:
 
 
 @future_safe
-async def insert_version_change(version_change: VersionChangeDto) -> Box:
+async def insert_version_change(version_change: ClientVersionChangeDto) -> Box:
     return await db.write_data(
         _SQL_INSERT_VERSION_CHANGE,
         (

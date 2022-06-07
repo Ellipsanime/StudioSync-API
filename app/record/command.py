@@ -15,8 +15,6 @@ class UpsertClientProjectCommand:
     id: int | None
     name: str
     code: str
-    uri: str
-    meta: Dict | None
 
     @staticmethod
     def unbox(data: Box) -> "UpsertClientProjectCommand":
@@ -24,8 +22,6 @@ class UpsertClientProjectCommand:
             data.id or None,
             data.name,
             data.code,
-            data.uri,
-            data.meta or None,
         )
 
 
@@ -35,6 +31,8 @@ class UpsertClientProjectSplitCommand:
     origin_id: int
     project_id: int
     name: str
+    uri: str
+    meta: Dict | None
 
     @staticmethod
     def unbox(data: Box) -> "UpsertClientProjectSplitCommand":
@@ -43,6 +41,8 @@ class UpsertClientProjectSplitCommand:
             data.origin_id,
             data.project_id,
             data.name,
+            data.uri,
+            data.meta or None,
         )
 
 

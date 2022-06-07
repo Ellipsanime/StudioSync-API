@@ -14,7 +14,7 @@ from app.record.dto import (
     dto_from_attr,
     ClientProjectDto,
     ClientProjectSplitDto,
-    VersionChangeDto,
+    ClientVersionChangeDto,
 )
 from app.writer import client_writer
 
@@ -44,7 +44,7 @@ async def create_version_change(
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(VersionChangeDto),
+        dto_from_attr(ClientVersionChangeDto),
         client_writer.insert_version_change,
     )
 

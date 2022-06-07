@@ -33,8 +33,6 @@ class ClientProjectParams(BaseModel):
     id: int | None
     name: str
     code: str
-    uri: AnyUrl
-    meta: Dict | None
 
 
 class ClientProjectSplitParams(BaseModel):
@@ -42,6 +40,8 @@ class ClientProjectSplitParams(BaseModel):
     origin_id: int
     project_id: int
     name: str
+    uri: AnyUrl
+    meta: Dict | None
 
 
 class ProviderProjectParams(BaseModel):

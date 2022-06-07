@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS provider_project_split (
     id INTEGER PRIMARY KEY NOT NULL, 
     name TEXT NOT NULL
 );
+
 CREATE TABLE IF NOT EXISTS provider_file (
     id INTEGER PRIMARY KEY NOT NULL, 
     code TEXT NOT NULL,
@@ -26,14 +27,14 @@ CREATE TABLE IF NOT EXISTS provider_file (
     extension TEXT NOT NULL,
     path TEXT NOT NULL,
     CONSTRAINT fk_pvc
-        FOREIGN KEY (version_change_id) 
+        FOREIGN KEY (version_change_id)
         REFERENCES provider_version_change (id) 
 );
 
 CREATE TABLE IF NOT EXISTS provider_version_change (
     id INTEGER PRIMARY KEY NOT NULL,
     datetime INTEGER NOT NULL,
-    project_id INTEGER NOT NULL,
+    project_split_id INTEGER NOT NULL,
     entity_type TEXT NOT NULL,
     entity_name TEXT NOT NULL,
     task TEXT NOT NULL,
@@ -41,7 +42,7 @@ CREATE TABLE IF NOT EXISTS provider_version_change (
     revision INTEGER NOT NULL,
     comment TEXT NOT NULL,
     CONSTRAINT fk_pp
-        FOREIGN KEY (project_id) 
+        FOREIGN KEY (project_split_id)
         REFERENCES provider_project_split (id) 
 );
 
@@ -51,7 +52,7 @@ FOR EACH ROW
 WHEN EXISTS (
   SELECT 1 
   FROM provider_version_change pvc
-  WHERE pvc.project_id = OLD.id
+  WHERE pvc.project_split_id = OLD.id
 )
 BEGIN      
   SELECT 
@@ -98,9 +99,10 @@ AS
            pf.extension as file_extension,
            pf.path as file_path
     FROM provider_version_change pvc
-             INNER JOIN provider_project_split pp ON (pp.id = pvc.project_id)
-             LEFT OUTER JOIN provider_file pf
-                             ON (pvc.id = pf.version_change_id);
+    INNER JOIN provider_project_split pp 
+        ON (pp.id = pvc.project_split_id)
+    LEFT OUTER JOIN provider_file pf
+        ON (pvc.id = pf.version_change_id);
 
 ------------------------------------
 --------------  CLIENT  ------------
@@ -110,6 +112,8 @@ CREATE TABLE IF NOT EXISTS client_project_split (
     origin_id INTEGER NOT NULL,
     project_id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    uri TEXT NOT NULL,
+    meta TEXT,
     PRIMARY KEY (id),
     CONSTRAINT fk_cis
         FOREIGN KEY (project_id) 
@@ -152,8 +156,6 @@ CREATE TABLE IF NOT EXISTS client_project (
     id INTEGER NOT NULL,
     name TEXT NOT NULL,
     code TEXT NOT NULL,
-    uri TEXT NOT NULL,
-    meta TEXT,
     PRIMARY KEY (id)
 );
 
@@ -232,12 +234,12 @@ AS
            pf.extension as file_extension,
            pf.path as file_path
     FROM client_version_change pvc
-             INNER JOIN client_project_split cps 
-                ON (cps.id = pvc.project_split_id)
-             INNER JOIN client_project cp
-                ON (cp.id = cps.project_id)
-             LEFT OUTER JOIN client_file pf
-                ON (pf.version_change_id = pvc.id);
+        INNER JOIN client_project_split cps 
+           ON (cps.id = pvc.project_split_id)
+        INNER JOIN client_project cp
+           ON (cp.id = cps.project_id)
+        LEFT OUTER JOIN client_file pf
+           ON (pf.version_change_id = pvc.id);
 """
 
 

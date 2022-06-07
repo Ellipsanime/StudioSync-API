@@ -15,8 +15,6 @@ class ClientProjectDto:
     id: int | None
     name: str
     code: str
-    uri: str
-    meta: Dict | None
 
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -25,10 +23,12 @@ class ClientProjectSplitDto:
     project_id: int
     origin_id: int
     name: str
+    uri: str
+    meta: Dict | None
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class VersionChangeDto:
+class ClientVersionChangeDto:
     origin_id: int
     datetime: datetime
     project_split_id: int
@@ -43,9 +43,40 @@ class VersionChangeDto:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class FileDto:
+class ClientFileDto:
     id: int | None
     origin_id: int
+    code: str
+    datetime: datetime
+    version_change_id: int
+    task: str
+    element: str
+    extension: str
+    path: str
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class ProviderProjectSplitDto:
+    id: int | None
+    name: str
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class ProviderVersionChangeDto:
+    datetime: datetime
+    project_split_id: int
+    entity_type: str
+    entity_name: str
+    task: str
+    status: str
+    revision: str
+    comment: str
+    id: int | None = None
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class ProviderFileDto:
+    id: int | None
     code: str
     datetime: datetime
     version_change_id: int
