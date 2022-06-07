@@ -33,7 +33,7 @@ def _setup_cors(app: FastAPI) -> FastAPI:
 
 @lru_cache
 def _setup_app() -> FastAPI:
-    app = FastAPI(**{})
+    app = FastAPI(**{"title": "Studio Sync API", "version": "0.0.1"})
     app.include_router(meta.router)
     app.include_router(client.router)
     app.include_router(provider.router)
