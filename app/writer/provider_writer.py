@@ -8,27 +8,24 @@ from app.record.dto import (
 )
 from app.util import db
 
-_SQL_REPLACE_PROJECT = """
-REPLACE INTO provider_project_split (id, name)
-VALUES (?, ?)
-"""
 
 _SQL_REPLACE_PROJECT_SPLIT = """
-REPLACE INTO provider_project_split (id, name)
-VALUES (?, ?)
+REPLACE INTO provider_project_split (id, name, tracker_id)
+VALUES (?, ?, ?)
 """
 
 _SQL_REPLACE_FILE = """
 REPLACE INTO provider_file (id, code, datetime, task, 
-                            version_change_id, element, extension, path)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            version_change_id, element, extension, path, 
+                            tracker_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_REPLACE_VERSION_CHANGE = """
 REPLACE INTO provider_version_change (id, datetime, project_split_id, 
                                       entity_type, entity_name, task, status,
-                                      revision, comment)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                      revision, comment, tracker_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 
@@ -39,6 +36,7 @@ async def upsert_project_split(project_split: ProviderProjectSplitDto) -> Box:
         (
             project_split.id or None,
             project_split.name,
+            project_split.tracker_id,
         ),
     )
 
@@ -55,6 +53,7 @@ async def upsert_file(file: ProviderFileDto) -> Box:
             file.element,
             file.extension,
             file.path,
+            file.tracker_id,
         ),
     )
 
@@ -74,5 +73,6 @@ async def upsert_version_change(
             version_change.status,
             version_change.revision,
             version_change.comment,
+            version_change.tracker_id,
         ),
     )

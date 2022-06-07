@@ -44,12 +44,7 @@ class ClientProjectSplitParams(BaseModel):
     meta: Dict | None
 
 
-class ProviderProjectParams(BaseModel):
-    id: int | None
-    name: str
-
-
-class VersionChangeParams(BaseModel):
+class ClientVersionChangeParams(BaseModel):
     id: int | None
     origin_id: int
     datetime: datetime
@@ -67,9 +62,40 @@ class UpdateVersionChangeParams(BaseModel):
     processed: bool
 
 
-class FileParams(BaseModel):
+class ClientFileParams(BaseModel):
     id: int | None
     origin_id: int
+    code: str
+    datetime: datetime
+    version_change_id: int
+    task: str
+    element: str
+    extension: str
+    path: str
+
+
+class ProviderProjectParams(BaseModel):
+    id: int | None
+    name: str
+    tracker_id: str
+
+
+class ProviderVersionChangeParams(BaseModel):
+    id: int | None
+    tracker_id: str
+    datetime: datetime
+    project_split_id: int
+    entity_type: str
+    entity_name: str
+    task: str
+    status: str
+    revision: str
+    comment: str
+
+
+class PrivateFileParams(BaseModel):
+    id: int | None
+    tracker_id: str
     code: str
     datetime: datetime
     version_change_id: int

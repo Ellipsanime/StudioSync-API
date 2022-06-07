@@ -89,6 +89,7 @@ def generate_provider_project_splits(
     return [
         ProviderProjectSplitDto(
             id=x,
+            tracker_id=_R.person.identifier(),
             name=f"{_R.person.full_name()} {_R.person.university()}",
         )
         for x in range(1, num + 1)
@@ -110,6 +111,7 @@ def generate_provider_version_changes(
             status=_R.person.surname(),
             revision=_R.numeric.increment(),
             comment=_R.text.quote(),
+            tracker_id=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]
@@ -128,6 +130,7 @@ def generate_provider_files(
             element=_R.person.surname(),
             extension=_R.file.extension(),
             path=f"{_R.path.project_dir()}/{_R.file.file_name()}",
+            tracker_id=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]

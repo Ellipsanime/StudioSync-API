@@ -6,8 +6,8 @@ from returns._internal.pipeline.flow import flow
 
 from app.record.http_model import (
     ProviderProjectParams,
-    VersionChangeParams,
-    FileParams, boxify_params, VersionChangeQueryParams,
+    ClientVersionChangeParams,
+    ClientFileParams, boxify_params, VersionChangeQueryParams,
 )
 from app.record.query import VersionChangeQuery
 from app.repo import provider_repo
@@ -50,11 +50,11 @@ async def upsert_project(
 
 @router.post("/version_change")
 async def create_version_change(
-    version_change_model: VersionChangeParams,
+    version_change_model: ClientVersionChangeParams,
 ) -> Any:
     return
 
 
 @router.post("/file")
-async def create_file(file_model: FileParams) -> Any:
+async def create_file(file_model: ClientFileParams) -> Any:
     return

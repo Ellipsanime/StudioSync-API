@@ -7,8 +7,9 @@ from app.record.command import (
     UpsertClientProjectCommand,
     RemoveProjectCommand,
     UpsertClientProjectSplitCommand,
-    CreateVersionChangeCommand,
-    CreateFileCommand, UpdateVersionChangeCommand,
+    CreateClientVersionChangeCommand,
+    CreateClientFileCommand,
+    UpdateClientVersionChangeCommand,
 )
 from app.record.dto import (
     dto_from_attr,
@@ -40,7 +41,7 @@ async def create_or_update_project_split(
 
 
 async def create_version_change(
-    command: CreateVersionChangeCommand,
+    command: CreateClientVersionChangeCommand,
 ) -> Any:
     return await flow(
         command,
@@ -50,7 +51,7 @@ async def create_version_change(
 
 
 async def update_version_change(
-    command: UpdateVersionChangeCommand,
+    command: UpdateClientVersionChangeCommand,
 ) -> Any:
     return await flow(
         command,
@@ -59,7 +60,7 @@ async def update_version_change(
 
 
 async def create_file(
-    command: CreateFileCommand,
+    command: CreateClientFileCommand,
 ) -> Any:
     return await flow(
         command,

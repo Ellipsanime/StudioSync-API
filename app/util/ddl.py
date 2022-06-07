@@ -13,12 +13,14 @@ _SCRIPT = """
 -------------- PROVIDER ------------
 ------------------------------------
 CREATE TABLE IF NOT EXISTS provider_project_split (
-    id INTEGER PRIMARY KEY NOT NULL, 
+    id INTEGER PRIMARY KEY NOT NULL,
+    tracker_id TEXT NOT NULL,
     name TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS provider_file (
     id INTEGER PRIMARY KEY NOT NULL, 
+    tracker_id TEXT NOT NULL,
     code TEXT NOT NULL,
     datetime INTEGER NOT NULL,
     version_change_id INTEGER NOT NULL,
@@ -33,6 +35,7 @@ CREATE TABLE IF NOT EXISTS provider_file (
 
 CREATE TABLE IF NOT EXISTS provider_version_change (
     id INTEGER PRIMARY KEY NOT NULL,
+    tracker_id TEXT NOT NULL,
     datetime INTEGER NOT NULL,
     project_split_id INTEGER NOT NULL,
     entity_type TEXT NOT NULL,

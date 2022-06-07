@@ -14,15 +14,15 @@ from app.record.command import (
     UpsertClientProjectSplitCommand,
     UpsertClientProjectCommand,
     RemoveProjectCommand,
-    CreateVersionChangeCommand,
-    CreateFileCommand,
-    UpdateVersionChangeCommand,
+    CreateClientVersionChangeCommand,
+    CreateClientFileCommand,
+    UpdateClientVersionChangeCommand,
 )
 from app.record.http_model import (
     ClientProjectSplitParams,
-    VersionChangeParams,
+    ClientVersionChangeParams,
     ClientProjectParams,
-    FileParams,
+    ClientFileParams,
     boxify_params,
     UpdateVersionChangeParams,
     VersionChangeQueryParams,
@@ -81,12 +81,12 @@ async def upsert_project_split(
 
 @router.post("/version-change")
 async def create_version_change(
-    version_change_model: VersionChangeParams,
+    version_change_model: ClientVersionChangeParams,
 ) -> Any:
     return await flow(
         version_change_model,
         boxify_params,
-        CreateVersionChangeCommand.unbox,
+        CreateClientVersionChangeCommand.unbox,
         client_domain.create_version_change,
         process_result,
     )
@@ -116,11 +116,11 @@ async def remove_project(project_id: int) -> Any:
 
 
 @router.post("/file")
-async def create_file(file_model: FileParams) -> Any:
+async def create_file(file_model: ClientFileParams) -> Any:
     return await flow(
         file_model,
         boxify_params,
-        CreateFileCommand.unbox,
+        CreateClientFileCommand.unbox,
         client_domain.create_file,
         process_result,
     )
@@ -137,7 +137,7 @@ async def update_version_change(
             "id": id_,
         },
         boxify,
-        UpdateVersionChangeCommand.unbox,
+        UpdateClientVersionChangeCommand.unbox,
         client_domain.update_version_change,
         process_result,
     )

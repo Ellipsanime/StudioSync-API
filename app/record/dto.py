@@ -58,11 +58,13 @@ class ClientFileDto:
 @attr.s(auto_attribs=True, frozen=True)
 class ProviderProjectSplitDto:
     id: int | None
+    tracker_id: str
     name: str
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class ProviderVersionChangeDto:
+    tracker_id: str
     datetime: datetime
     project_split_id: int
     entity_type: str
@@ -77,6 +79,7 @@ class ProviderVersionChangeDto:
 @attr.s(auto_attribs=True, frozen=True)
 class ProviderFileDto:
     id: int | None
+    tracker_id: str
     code: str
     datetime: datetime
     version_change_id: int
