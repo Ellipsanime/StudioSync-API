@@ -4,8 +4,10 @@ ENV HOST 0.0.0.0
 ENV PORT 8090
 ENV WORKERS 1
 ENV WORKER_CLASS uvicorn.workers.UvicornWorker
+ENV DB_PATH /data/db/database.sqlite
 
 WORKDIR /code
+RUN mkdir -p /data/db
 RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get install -y sqlite3 libsqlite3-dev
