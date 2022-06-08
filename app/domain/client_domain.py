@@ -3,55 +3,55 @@ from typing import Any
 from box import Box
 from returns.pipeline import flow
 
-from app.record.command import (
-    UpsertClientProjectCommand,
+from app.record.client.command import (
+    UpsertProjectCommand,
     RemoveProjectCommand,
-    UpsertClientProjectSplitCommand,
-    CreateClientVersionChangeCommand,
-    CreateClientFileCommand,
-    UpdateClientVersionChangeCommand,
+    UpsertProjectSplitCommand,
+    CreateVersionChangeCommand,
+    CreateFileCommand,
+    UpdateVersionChangeCommand,
 )
-from app.record.dto import (
-    dto_from_attr,
-    ClientProjectDto,
-    ClientProjectSplitDto,
-    ClientVersionChangeDto,
+from app.record.client.dto import (
+    ProjectDto,
+    ProjectSplitDto,
+    VersionChangeDto,
 )
+from app.util.data import dto_from_attr
 from app.writer import client_writer
 
 
 async def create_or_update_project(
-    command: UpsertClientProjectCommand,
+    command: UpsertProjectCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientProjectDto),
+        dto_from_attr(ProjectDto),
         client_writer.upsert_project,
     )
 
 
 async def create_or_update_project_split(
-    command: UpsertClientProjectSplitCommand,
+    command: UpsertProjectSplitCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientProjectSplitDto),
+        dto_from_attr(ProjectSplitDto),
         client_writer.upsert_project_split,
     )
 
 
 async def create_version_change(
-    command: CreateClientVersionChangeCommand,
+    command: CreateVersionChangeCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientVersionChangeDto),
+        dto_from_attr(VersionChangeDto),
         client_writer.insert_version_change,
     )
 
 
 async def update_version_change(
-    command: UpdateClientVersionChangeCommand,
+    command: UpdateVersionChangeCommand,
 ) -> Any:
     return await flow(
         command,
@@ -60,11 +60,11 @@ async def update_version_change(
 
 
 async def create_file(
-    command: CreateClientFileCommand,
+    command: CreateFileCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ClientProjectSplitDto),
+        dto_from_attr(ProjectSplitDto),
         client_writer.insert_file,
     )
 

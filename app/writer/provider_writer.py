@@ -1,11 +1,8 @@
 from box import Box
 from returns.future import future_safe
 
-from app.record.dto import (
-    ProviderProjectSplitDto,
-    ProviderFileDto,
-    ProviderVersionChangeDto,
-)
+from app.record.provider.dto import ProjectSplitDto, \
+    VersionChangeDto, FileDto
 from app.util import db
 
 
@@ -30,7 +27,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
 
 @future_safe
-async def upsert_project_split(project_split: ProviderProjectSplitDto) -> Box:
+async def upsert_project_split(project_split: ProjectSplitDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT_SPLIT,
         (
@@ -41,7 +38,8 @@ async def upsert_project_split(project_split: ProviderProjectSplitDto) -> Box:
     )
 
 
-async def upsert_file(file: ProviderFileDto) -> Box:
+@future_safe
+async def upsert_file(file: FileDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_FILE,
         (
@@ -58,8 +56,9 @@ async def upsert_file(file: ProviderFileDto) -> Box:
     )
 
 
+@future_safe
 async def upsert_version_change(
-    version_change: ProviderVersionChangeDto,
+    version_change: VersionChangeDto,
 ) -> Box:
     return await db.write_data(
         _SQL_REPLACE_VERSION_CHANGE,

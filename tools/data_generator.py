@@ -1,23 +1,23 @@
 from typing import List
 
-from box import Box
 from mimesis import Generic
 from mimesis.enums import Locale
 
-from app.record.dto import (
-    ClientProjectDto,
-    ClientProjectSplitDto,
-    ClientVersionChangeDto,
-    ClientFileDto,
-    ProviderProjectSplitDto, ProviderVersionChangeDto, ProviderFileDto,
+from app.record.client.dto import (
+    ProjectDto,
+    ProjectSplitDto,
+    VersionChangeDto,
+    FileDto,
 )
+from app.record.provider.dto import ProjectSplitDto, \
+    VersionChangeDto, FileDto
 
 _R = Generic(locale=Locale.DE)
 
 
-def generate_client_project(num: int = 5) -> List[ClientProjectDto]:
+def generate_client_project(num: int = 5) -> List[ProjectDto]:
     return [
-        ClientProjectDto(
+        ProjectDto(
             x,
             f"project_{_R.person.identifier()}_{x}",
             _R.person.identifier().split("/")[0],
@@ -28,9 +28,9 @@ def generate_client_project(num: int = 5) -> List[ClientProjectDto]:
 
 def generate_client_project_splits(
     project_id: int, num: int = 5
-) -> List[ClientProjectSplitDto]:
+) -> List[ProjectSplitDto]:
     return [
-        ClientProjectSplitDto(
+        ProjectSplitDto(
             id=x,
             origin_id=_R.numeric.increment(),
             project_id=project_id,
@@ -45,9 +45,9 @@ def generate_client_project_splits(
 def generate_client_version_changes(
     project_split_id: int,
     num: int = 5,
-) -> List[ClientVersionChangeDto]:
+) -> List[VersionChangeDto]:
     return [
-        ClientVersionChangeDto(
+        VersionChangeDto(
             id=x,
             origin_id=_R.numeric.increment(),
             datetime=_R.datetime.datetime().timestamp(),
@@ -66,9 +66,9 @@ def generate_client_version_changes(
 
 def generate_client_files(
     num: int = 5, version_id=lambda x: int(x / 10) if int(x / 10) else 1
-) -> List[ClientFileDto]:
+) -> List[FileDto]:
     return [
-        ClientFileDto(
+        FileDto(
             id=x,
             origin_id=_R.numeric.increment(),
             datetime=_R.datetime.datetime().timestamp(),
@@ -85,9 +85,9 @@ def generate_client_files(
 
 def generate_provider_project_splits(
     num: int = 5,
-) -> List[ProviderProjectSplitDto]:
+) -> List[ProjectSplitDto]:
     return [
-        ProviderProjectSplitDto(
+        ProjectSplitDto(
             id=x,
             tracker_id=_R.person.identifier(),
             name=f"{_R.person.full_name()} {_R.person.university()}",
@@ -99,9 +99,9 @@ def generate_provider_project_splits(
 def generate_provider_version_changes(
     project_split_id: int,
     num: int = 5,
-) -> List[ProviderVersionChangeDto]:
+) -> List[VersionChangeDto]:
     return [
-        ProviderVersionChangeDto(
+        VersionChangeDto(
             id=x,
             datetime=_R.datetime.datetime().timestamp(),
             project_split_id=project_split_id,
@@ -119,9 +119,9 @@ def generate_provider_version_changes(
 
 def generate_provider_files(
     num: int = 5, version_id=lambda x: int(x / 10) if int(x / 10) else 1
-) -> List[ProviderFileDto]:
+) -> List[FileDto]:
     return [
-        ProviderFileDto(
+        FileDto(
             id=x,
             datetime=_R.datetime.datetime().timestamp(),
             version_change_id=version_id(x),

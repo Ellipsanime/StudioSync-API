@@ -1,6 +1,9 @@
-from typing import Dict, Any
+from typing import Dict, Any, Type
 
+import attr
 from box import Box
+from pydantic import BaseModel
+from returns.curry import curry
 
 
 def boxify(data: Dict[str, Any]) -> Box:
@@ -21,3 +24,12 @@ def to_record(data: Dict[str, Any]) -> Box:
             **dict(data),
         }
     )
+
+
+@curry
+def dto_from_attr(ctor: Type, data: Any) -> Type:
+    return ctor(**attr.asdict(data))
+
+
+def boxify_params(model: BaseModel) -> Box:
+    return boxify(model.dict(exclude_unset=True))

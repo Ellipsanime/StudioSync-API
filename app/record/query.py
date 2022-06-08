@@ -28,3 +28,21 @@ class VersionChangeQuery:
             data.skip or 0,
             data.limit or 500,
         )
+
+
+@attr.s(auto_attribs=True, frozen=True)
+class SimpleFetchQuery:
+    sort_field: str = "id"
+    sort_order: str = "ASC"
+    skip: int = 0
+    limit: int = 500
+
+    @staticmethod
+    def unbox(data: Box) -> "SimpleFetchQuery":
+        return SimpleFetchQuery(
+            data.sort_field.value,
+            data.sort_order.value,
+            data.skip or 0,
+            data.limit or 500,
+        )
+

@@ -1,18 +1,14 @@
-from sqlite3 import IntegrityError
-
 import jsonpickle
 from box import Box
 from returns.future import future_safe
-from returns.result import safe
 
-from app.record.dto import (
-    ClientProjectDto,
-    ClientProjectSplitDto,
-    ClientFileDto,
-    ClientVersionChangeDto,
+from app.record.client.dto import (
+    ProjectDto,
+    ProjectSplitDto,
+    FileDto,
+    VersionChangeDto,
 )
 from app.util import db
-from app.util.data import to_record, boxify
 
 _SQL_REPLACE_PROJECT_SPLIT = """
 REPLACE INTO client_project_split (id, name, origin_id, project_id, uri, meta)
@@ -70,7 +66,7 @@ async def remove_project(id_: int) -> Box:
 
 
 @future_safe
-async def upsert_project(project: ClientProjectDto) -> Box:
+async def upsert_project(project: ProjectDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT,
         (
@@ -82,7 +78,7 @@ async def upsert_project(project: ClientProjectDto) -> Box:
 
 
 @future_safe
-async def upsert_project_split(project_split: ClientProjectSplitDto) -> Box:
+async def upsert_project_split(project_split: ProjectSplitDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT_SPLIT,
         (
@@ -97,7 +93,7 @@ async def upsert_project_split(project_split: ClientProjectSplitDto) -> Box:
 
 
 @future_safe
-async def insert_file(file: ClientFileDto) -> Box:
+async def insert_file(file: FileDto) -> Box:
     return await db.write_data(
         _SQL_INSERT_FILE,
         (
@@ -115,7 +111,7 @@ async def insert_file(file: ClientFileDto) -> Box:
 
 
 @future_safe
-async def upsert_file(file: ClientFileDto) -> Box:
+async def upsert_file(file: FileDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_FILE,
         (
@@ -141,7 +137,7 @@ async def update_version_change(id_: int, processed: bool) -> Box:
 
 
 @future_safe
-async def upsert_version_change(version_change: ClientVersionChangeDto) -> Box:
+async def upsert_version_change(version_change: VersionChangeDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_VERSION_CHANGE,
         (
@@ -161,7 +157,7 @@ async def upsert_version_change(version_change: ClientVersionChangeDto) -> Box:
 
 
 @future_safe
-async def insert_version_change(version_change: ClientVersionChangeDto) -> Box:
+async def insert_version_change(version_change: VersionChangeDto) -> Box:
     return await db.write_data(
         _SQL_INSERT_VERSION_CHANGE,
         (
