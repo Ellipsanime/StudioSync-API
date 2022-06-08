@@ -14,7 +14,7 @@ from app.record.client.command import (
 from app.record.client.dto import (
     ProjectDto,
     ProjectSplitDto,
-    VersionChangeDto,
+    VersionChangeDto, FileDto,
 )
 from app.util.data import dto_from_attr
 from app.writer import client_writer
@@ -64,7 +64,7 @@ async def create_file(
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ProjectSplitDto),
+        dto_from_attr(FileDto),
         client_writer.insert_file,
     )
 

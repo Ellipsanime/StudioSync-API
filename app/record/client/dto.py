@@ -38,7 +38,6 @@ class VersionChangeDto:
 
 @attr.s(auto_attribs=True, frozen=True)
 class FileDto:
-    id: int | None
     origin_id: int
     code: str
     datetime: datetime
@@ -47,3 +46,4 @@ class FileDto:
     element: str
     extension: str
     path: str
+    id: int | None = None
