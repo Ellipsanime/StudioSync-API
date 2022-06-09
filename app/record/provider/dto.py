@@ -4,17 +4,17 @@ import attr
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ProjectSplitDto:
+class ProjectDto:
     id: int | None
-    tracker_id: str
+    project_tracker_id: str
     name: str
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class VersionChangeDto:
-    tracker_id: str
+    project_tracker_id: str
     datetime: datetime
-    project_split_id: int
+    project_id: int
     entity_type: str
     entity_name: str
     task: str
@@ -27,7 +27,7 @@ class VersionChangeDto:
 @attr.s(auto_attribs=True, frozen=True)
 class FileDto:
     id: int | None
-    tracker_id: str
+    project_tracker_id: str
     code: str
     datetime: datetime
     version_change_id: int

@@ -10,7 +10,7 @@ from app.util.data import boxify
 from app.util.repo import map_group, convert_datetime
 
 _SQL_ALL_FILES = "SELECT * FROM provider_file"
-_SQL_ALL_PROJECT_SPLITS = "SELECT * FROM provider_project_split"
+_SQL_ALL_PROJECT_SPLITS = "SELECT * FROM provider_project"
 _SQL_ALL_VERSION_CHANGES = "SELECT * FROM provider_version_change"
 
 
@@ -34,14 +34,14 @@ def _get_version_change_view_sql(query: VersionChangeQuery) -> str:
     if query.value is None:
         return f"""
             SELECT * FROM provider_version_file_view
-            WHERE project_name = ? 
+            WHERE origin_name = ? 
             ORDER BY {query.sort_field} {query.sort_order}
             LIMIT ? OFFSET ?
         """
 
     return f"""
         SELECT * FROM provider_version_file_view
-        WHERE project_name = ? AND {query.field} = ? 
+        WHERE origin_name = ? AND {query.field} = ? 
         ORDER BY {query.sort_field} {query.sort_order}
         LIMIT ? OFFSET ?
     """
@@ -70,9 +70,9 @@ async def find_version_changes(
     ]
 
 
-async def fetch_project_splits() -> List[Box]:
-    raw_projects = await db.fetch_all(_SQL_ALL_PROJECT_SPLITS)
-    return [boxify(x) for x in raw_projects]
+async def fetch_projects() -> List[Box]:
+    raw_origins = await db.fetch_all(_SQL_ALL_PROJECT_SPLITS)
+    return [boxify(x) for x in raw_origins]
 
 
 async def fetch_version_changes(query: SimpleFetchQuery) -> List[Box]:

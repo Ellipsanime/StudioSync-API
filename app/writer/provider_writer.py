@@ -1,39 +1,39 @@
 from box import Box
 from returns.future import future_safe
 
-from app.record.provider.dto import ProjectSplitDto, \
+from app.record.provider.dto import ProjectDto, \
     VersionChangeDto, FileDto
 from app.util import db
 
 
 _SQL_REPLACE_PROJECT_SPLIT = """
-REPLACE INTO provider_project_split (id, name, tracker_id)
+REPLACE INTO provider_project (id, name, project_tracker_id)
 VALUES (?, ?, ?)
 """
 
 _SQL_REPLACE_FILE = """
 REPLACE INTO provider_file (id, code, datetime, task, 
                             version_change_id, element, extension, path, 
-                            tracker_id)
+                            project_tracker_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_REPLACE_VERSION_CHANGE = """
-REPLACE INTO provider_version_change (id, datetime, project_split_id, 
+REPLACE INTO provider_version_change (id, datetime, project_id, 
                                       entity_type, entity_name, task, status,
-                                      revision, comment, tracker_id)
+                                      revision, comment, project_tracker_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 
 @future_safe
-async def upsert_project_split(project_split: ProjectSplitDto) -> Box:
+async def upsert_project(project: ProjectDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT_SPLIT,
         (
-            project_split.id or None,
-            project_split.name,
-            project_split.tracker_id,
+            project.id or None,
+            project.name,
+            project.project_tracker_id,
         ),
     )
 
@@ -51,7 +51,7 @@ async def upsert_file(file: FileDto) -> Box:
             file.element,
             file.extension,
             file.path,
-            file.tracker_id,
+            file.project_tracker_id,
         ),
     )
 
@@ -65,13 +65,13 @@ async def upsert_version_change(
         (
             version_change.id,
             version_change.datetime,
-            version_change.project_split_id,
+            version_change.project_id,
             version_change.entity_type,
             version_change.entity_name,
             version_change.task,
             version_change.status,
             version_change.revision,
             version_change.comment,
-            version_change.tracker_id,
+            version_change.project_tracker_id,
         ),
     )

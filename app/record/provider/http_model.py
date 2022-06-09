@@ -40,17 +40,17 @@ class EnhancedVersionChangeFetchParams(PagingParams):
     sort_order: SortOrder = Field(SortOrder.ASC, title="Sort-by order")
 
 
-class ProjectParams(BaseModel):
+class OriginParams(BaseModel):
     id: int | None
-    tracker_id: str
+    project_tracker_id: str
     name: str
 
 
 class VersionChangeParams(BaseModel):
     id: int | None
-    tracker_id: str
+    project_tracker_id: str
     datetime: datetime
-    project_split_id: int
+    project_id: int
     entity_type: str
     entity_name: str
     task: str
@@ -61,7 +61,7 @@ class VersionChangeParams(BaseModel):
 
 class FileParams(BaseModel):
     id: int | None
-    tracker_id: str
+    project_tracker_id: str
     code: str
     datetime: datetime
     version_change_id: int

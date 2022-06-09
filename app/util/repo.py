@@ -20,7 +20,7 @@ def get_subdict(entity: Dict[str, Any], key: str) -> Dict[str, Any]:
 
 def map_group(group: List[Box]) -> Box:
     version = convert_datetime(get_subdict(group[0], "version_"))
-    project = get_subdict(group[0], "project_")
+    project = get_subdict(group[0], "origin_")
     linked_files = [
         convert_datetime(get_subdict(x, "file_")) for x in group if x.file_id
     ]

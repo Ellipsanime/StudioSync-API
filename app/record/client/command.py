@@ -6,19 +6,19 @@ from datetime import datetime
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class RemoveProjectCommand:
-    project_id: int
+class RemoveOriginCommand:
+    origin_id: int
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertProjectCommand:
+class UpsertOriginCommand:
     id: int | None
     name: str
     code: str
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertProjectCommand":
-        return UpsertProjectCommand(
+    def unbox(data: Box) -> "UpsertOriginCommand":
+        return UpsertOriginCommand(
             data.id or None,
             data.name,
             data.code,
@@ -26,20 +26,20 @@ class UpsertProjectCommand:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertProjectSplitCommand:
+class UpsertProjectCommand:
     id: int | None
     origin_id: int
-    project_id: int
+    origin_id: int
     name: str
     uri: str
     meta: Dict | None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertProjectSplitCommand":
-        return UpsertProjectSplitCommand(
+    def unbox(data: Box) -> "UpsertProjectCommand":
+        return UpsertProjectCommand(
             data.id or None,
             data.origin_id,
-            data.project_id,
+            data.origin_id,
             data.name,
             data.uri,
             data.meta or None,
@@ -63,7 +63,7 @@ class UpdateVersionChangeCommand:
 class CreateVersionChangeCommand:
     origin_id: int
     datetime: datetime
-    project_split_id: int
+    project_id: int
     entity_type: str
     entity_name: str
     task: str
@@ -77,7 +77,7 @@ class CreateVersionChangeCommand:
         return CreateVersionChangeCommand(
             data.origin_id,
             data.datetime.timestamp(),
-            data.project_split_id,
+            data.project_id,
             data.entity_type,
             data.entity_name,
             data.task,

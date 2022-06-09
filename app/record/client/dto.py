@@ -5,16 +5,16 @@ from datetime import datetime
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ProjectDto:
+class OriginDto:
     id: int | None
     name: str
     code: str
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class ProjectSplitDto:
+class ProjectDto:
     id: int | None
-    project_id: int
+    origin_id: int
     origin_id: int
     name: str
     uri: str
@@ -25,7 +25,7 @@ class ProjectSplitDto:
 class VersionChangeDto:
     origin_id: int
     datetime: datetime
-    project_split_id: int
+    project_id: int
     entity_type: str
     entity_name: str
     task: str

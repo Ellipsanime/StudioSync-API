@@ -5,25 +5,25 @@ from box import Box
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertProjectSplitCommand:
+class UpsertProjectCommand:
     id: int | None
     name: str
-    tracker_id: str
+    project_tracker_id: str
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertProjectSplitCommand":
-        return UpsertProjectSplitCommand(
+    def unbox(data: Box) -> "UpsertProjectCommand":
+        return UpsertProjectCommand(
             data.id or None,
             data.name,
-            data.tracker_id
+            data.project_tracker_id
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class UpsertVersionChangeCommand:
-    tracker_id: str
+    project_tracker_id: str
     datetime: datetime
-    project_split_id: int
+    project_id: int
     entity_type: str
     entity_name: str
     task: str
@@ -35,9 +35,9 @@ class UpsertVersionChangeCommand:
     @staticmethod
     def unbox(data: Box) -> "UpsertVersionChangeCommand":
         return UpsertVersionChangeCommand(
-            data.tracker_id,
+            data.project_tracker_id,
             data.datetime.timestamp(),
-            data.project_split_id,
+            data.project_id,
             data.entity_type,
             data.entity_name,
             data.task,
@@ -50,7 +50,7 @@ class UpsertVersionChangeCommand:
 
 @attr.s(auto_attribs=True, frozen=True)
 class UpsertFileCommand:
-    tracker_id: str
+    project_tracker_id: str
     code: str
     datetime: datetime
     version_change_id: int
@@ -63,7 +63,7 @@ class UpsertFileCommand:
     @staticmethod
     def unbox(data: Box) -> "UpsertFileCommand":
         return UpsertFileCommand(
-            data.tracker_id,
+            data.project_tracker_id,
             data.code,
             data.datetime.timestamp(),
             data.version_change_id,

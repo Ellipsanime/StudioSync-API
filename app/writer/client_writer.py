@@ -3,15 +3,15 @@ from box import Box
 from returns.future import future_safe
 
 from app.record.client.dto import (
+    OriginDto,
     ProjectDto,
-    ProjectSplitDto,
     FileDto,
     VersionChangeDto,
 )
 from app.util import db
 
 _SQL_REPLACE_PROJECT_SPLIT = """
-REPLACE INTO client_project_split (id, name, origin_id, project_id, uri, meta)
+REPLACE INTO client_project (id, name, origin_id, origin_id, uri, meta)
 VALUES (?, ?, ?, ?, ?, ?)
 """
 
@@ -28,14 +28,14 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_INSERT_VERSION_CHANGE = """
-INSERT INTO client_version_change (id, datetime, project_split_id,
+INSERT INTO client_version_change (id, datetime, project_id,
                                     entity_type, entity_name, task, status,
                                     revision, comment, processed, origin_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_REPLACE_VERSION_CHANGE = """
-REPLACE INTO client_version_change (id, datetime, project_split_id,
+REPLACE INTO client_version_change (id, datetime, project_id,
                                     entity_type, entity_name, task, status,
                                     revision, comment, processed, origin_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -48,17 +48,17 @@ WHERE id = ?
 """
 
 _SQL_REPLACE_PROJECT = """
-REPLACE INTO client_project (id, name, code)
+REPLACE INTO client_origin (id, name, code)
 VALUES (?, ?, ?)
 """
 
 _SQL_DELETE_PROJECT = """
-DELETE FROM client_project WHERE id = ?
+DELETE FROM client_origin WHERE id = ?
 """
 
 
 @future_safe
-async def remove_project(id_: int) -> Box:
+async def remove_origin(id_: int) -> Box:
     return await db.write_data(
         _SQL_DELETE_PROJECT,
         (id_,),
@@ -66,7 +66,7 @@ async def remove_project(id_: int) -> Box:
 
 
 @future_safe
-async def upsert_project(project: ProjectDto) -> Box:
+async def upsert_origin(project: OriginDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT,
         (
@@ -78,16 +78,16 @@ async def upsert_project(project: ProjectDto) -> Box:
 
 
 @future_safe
-async def upsert_project_split(project_split: ProjectSplitDto) -> Box:
+async def upsert_project(project: ProjectDto) -> Box:
     return await db.write_data(
         _SQL_REPLACE_PROJECT_SPLIT,
         (
-            project_split.id or None,
-            project_split.name,
-            project_split.origin_id,
-            project_split.project_id,
-            project_split.uri,
-            jsonpickle.dumps(project_split.meta) if project_split.meta else None,
+            project.id or None,
+            project.name,
+            project.origin_id,
+            project.origin_id,
+            project.uri,
+            jsonpickle.dumps(project.meta) if project.meta else None,
         ),
     )
 
@@ -143,7 +143,7 @@ async def upsert_version_change(version_change: VersionChangeDto) -> Box:
         (
             version_change.id,
             version_change.datetime,
-            version_change.project_split_id,
+            version_change.project_id,
             version_change.entity_type,
             version_change.entity_name,
             version_change.task,
@@ -163,7 +163,7 @@ async def insert_version_change(version_change: VersionChangeDto) -> Box:
         (
             None,
             version_change.datetime,
-            version_change.project_split_id,
+            version_change.project_id,
             version_change.entity_type,
             version_change.entity_name,
             version_change.task,

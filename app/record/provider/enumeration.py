@@ -1,17 +1,17 @@
 from enum import Enum
 
 
-class ProjectSplitField(Enum):
+class ProjectField(Enum):
     ID = "id"
-    TRACKER_ID = "tracker_id"
+    TRACKER_ID = "project_tracker_id"
     NAME = "name"
 
 
 class VersionChangeField(Enum):
     ID = "id"
-    TRACKER_ID = "tracker_id"
+    TRACKER_ID = "project_tracker_id"
     DATETIME = "datetime"
-    PROJECT_SPLIT_ID = "project_split_id"
+    PROJECT_SPLIT_ID = "project_id"
     ENTITY_TYPE = "entity_type"
     ENTITY_NAME = "entity_name"
     TASK = "task"
@@ -22,7 +22,7 @@ class VersionChangeField(Enum):
 
 class FileField(Enum):
     ID = "id"
-    TRACKER_ID = "tracker_id"
+    TRACKER_ID = "project_tracker_id"
     CODE = "code"
     DATETIME = "datetime"
     VERSION_CHANGE_ID = "version_change_id"
@@ -41,7 +41,7 @@ class EnhancedVersionChangeSearchableField(Enum):
     VERSION_STATUS = "version_status"
     VERSION_REVISION = "version_revision"
     VERSION_COMMENT = "version_comment"
-    PROJECT_SPLIT_NAME = "project_split_name"
+    PROJECT_SPLIT_NAME = "project_name"
     FILE_ID = "file_id"
     FILE_ORIGIN_ID = "file_origin_id"
     FILE_CODE = "file_code"

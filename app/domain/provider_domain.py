@@ -3,21 +3,21 @@ from typing import Any
 from returns.pipeline import flow
 
 from app.record.provider.command import (
-    UpsertProjectSplitCommand,
+    UpsertProjectCommand,
     UpsertVersionChangeCommand,
 )
 from app.util.data import dto_from_attr
-from app.record.provider.dto import ProjectSplitDto, VersionChangeDto, FileDto
+from app.record.provider.dto import ProjectDto, VersionChangeDto, FileDto
 from app.writer import provider_writer
 
 
-async def create_or_update_project_split(
-    command: UpsertProjectSplitCommand,
+async def create_or_update_project(
+    command: UpsertProjectCommand,
 ) -> Any:
     return await flow(
         command,
-        dto_from_attr(ProjectSplitDto),
-        provider_writer.upsert_project_split,
+        dto_from_attr(ProjectDto),
+        provider_writer.upsert_project,
     )
 
 

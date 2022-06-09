@@ -4,13 +4,14 @@ from returns.pipeline import flow
 
 from box import Box
 
+from app.record.client.dto import ProjectDto
 from app.record.query import VersionChangeQuery, SimpleFetchQuery
 from app.util import db
 from app.util.data import boxify
 from app.util.repo import convert_datetime, map_group
 
-_SQL_ALL_PROJECT_SPLITS = "SELECT * FROM client_project_split"
-_SQL_ALL_PROJECTS = "SELECT * FROM client_project"
+_SQL_ALL_PROJECT_SPLITS = "SELECT * FROM client_project"
+_SQL_ALL_PROJECTS = "SELECT * FROM client_origin"
 
 
 def _get_file_sql(query: SimpleFetchQuery) -> str:
@@ -33,20 +34,20 @@ def _get_version_change_view_sql(query: VersionChangeQuery) -> str:
     if query.value is None:
         return f"""
             SELECT * FROM client_version_file_view
-            WHERE project_name = ? 
+            WHERE origin_name = ? 
             ORDER BY {query.sort_field} {query.sort_order}
             LIMIT ? OFFSET ?
         """
 
     return f"""
         SELECT * FROM client_version_file_view
-        WHERE project_name = ? AND {query.field} = ? 
+        WHERE origin_name = ? AND {query.field} = ? 
         ORDER BY {query.sort_field} {query.sort_order}
         LIMIT ? OFFSET ?
     """
 
 
-async def fetch_version_changes_per_project(
+async def fetch_version_changes_per_origin(
     query: VersionChangeQuery,
 ) -> List[Box]:
     params = tuple(
@@ -69,9 +70,9 @@ async def fetch_version_changes_per_project(
     ]
 
 
-async def fetch_project_splits() -> List[Box]:
-    raw_projects = await db.fetch_all(_SQL_ALL_PROJECT_SPLITS)
-    return [boxify(x) for x in raw_projects]
+async def fetch_projects() -> List[ProjectDto]:
+    raw_origins = await db.fetch_all(_SQL_ALL_PROJECT_SPLITS)
+    return [boxify(x) for x in raw_origins]
 
 
 async def fetch_version_changes(query: SimpleFetchQuery) -> List[Box]:
@@ -84,7 +85,7 @@ async def fetch_files(query: SimpleFetchQuery) -> List[Box]:
     return [convert_datetime(x) for x in files]
 
 
-async def fetch_projects() -> List[Box]:
+async def fetch_origins() -> List[Box]:
     projects = await db.fetch_all(_SQL_ALL_PROJECTS)
     return [boxify(x) for x in projects]
 

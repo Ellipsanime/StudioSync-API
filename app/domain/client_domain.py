@@ -4,20 +4,30 @@ from box import Box
 from returns.pipeline import flow
 
 from app.record.client.command import (
+    UpsertOriginCommand,
+    RemoveOriginCommand,
     UpsertProjectCommand,
-    RemoveProjectCommand,
-    UpsertProjectSplitCommand,
     CreateVersionChangeCommand,
     CreateFileCommand,
     UpdateVersionChangeCommand,
 )
 from app.record.client.dto import (
+    OriginDto,
     ProjectDto,
-    ProjectSplitDto,
     VersionChangeDto, FileDto,
 )
 from app.util.data import dto_from_attr
 from app.writer import client_writer
+
+
+async def create_or_update_origin(
+    command: UpsertOriginCommand,
+) -> Any:
+    return await flow(
+        command,
+        dto_from_attr(OriginDto),
+        client_writer.upsert_origin,
+    )
 
 
 async def create_or_update_project(
@@ -27,16 +37,6 @@ async def create_or_update_project(
         command,
         dto_from_attr(ProjectDto),
         client_writer.upsert_project,
-    )
-
-
-async def create_or_update_project_split(
-    command: UpsertProjectSplitCommand,
-) -> Any:
-    return await flow(
-        command,
-        dto_from_attr(ProjectSplitDto),
-        client_writer.upsert_project_split,
     )
 
 
@@ -69,5 +69,5 @@ async def create_file(
     )
 
 
-async def remove_project(command: RemoveProjectCommand) -> Box:
-    return await client_writer.remove_project(command.project_id)
+async def remove_origin(command: RemoveOriginCommand) -> Box:
+    return await client_writer.remove_origin(command.origin_id)

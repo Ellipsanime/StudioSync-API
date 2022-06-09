@@ -41,16 +41,16 @@ class EnhancedVersionChangeFetchParams(PagingParams):
     sort_order: SortOrder = Field(SortOrder.ASC, title="Sort-by order")
 
 
-class ProjectParams(BaseModel):
+class OriginParams(BaseModel):
     id: int | None
     name: str
     code: str
 
 
-class ProjectSplitParams(BaseModel):
+class ProjectParams(BaseModel):
     id: int | None
     origin_id: int
-    project_id: int
+    origin_id: int
     name: str
     uri: AnyUrl
     meta: Dict | None
@@ -60,7 +60,7 @@ class VersionChangeParams(BaseModel):
     id: int | None
     origin_id: int
     datetime: datetime
-    project_split_id: int
+    project_id: int
     entity_type: str
     entity_name: str
     task: str

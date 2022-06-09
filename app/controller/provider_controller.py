@@ -6,7 +6,7 @@ from returns.pipeline import flow
 
 from app.domain import provider_domain
 from app.record.provider.command import (
-    UpsertProjectSplitCommand,
+    UpsertProjectCommand,
     UpsertVersionChangeCommand,
     UpsertFileCommand,
 )
@@ -17,7 +17,7 @@ from app.record.provider.http_model import (
 )
 from app.util.data import boxify_params
 from app.record.provider.http_model import (
-    ProjectParams,
+    OriginParams,
     VersionChangeParams,
     FileParams,
 )
@@ -32,7 +32,7 @@ router = APIRouter(tags=["provider-v1"], prefix="/v1/provider")
 
 
 @router.get("/project-split/{name}/version-changes")
-async def version_changes_by_project_name(
+async def version_changes_by_origin_name(
     name: str,
     search_params: EnhancedVersionChangeFetchParams = Depends(
         EnhancedVersionChangeFetchParams
@@ -48,7 +48,7 @@ async def version_changes_by_project_name(
 
 @router.get("/project-splits")
 async def projects() -> List[Box]:
-    return await provider_repo.fetch_project_splits()
+    return await provider_repo.fetch_projects()
 
 
 @router.get("/version-changes")
@@ -76,14 +76,14 @@ async def files(
 
 
 @router.post("/project-split")
-async def upsert_project(
-    project_model: ProjectParams,
+async def upsert_origin(
+    origin_model: OriginParams,
 ) -> Any:
     return await flow(
-        project_model,
+        origin_model,
         boxify_params,
-        UpsertProjectSplitCommand.unbox,
-        provider_domain.create_or_update_project_split,
+        UpsertProjectCommand.unbox,
+        provider_domain.create_or_update_project,
         process_result,
     )
 

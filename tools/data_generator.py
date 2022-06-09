@@ -4,36 +4,36 @@ from mimesis import Generic
 from mimesis.enums import Locale
 
 from app.record.client.dto import (
+    OriginDto,
     ProjectDto,
-    ProjectSplitDto,
     VersionChangeDto,
     FileDto,
 )
-from app.record.provider.dto import ProjectSplitDto, \
+from app.record.provider.dto import ProjectDto, \
     VersionChangeDto, FileDto
 
 _R = Generic(locale=Locale.DE)
 
 
-def generate_client_project(num: int = 5) -> List[ProjectDto]:
+def generate_client_origin(num: int = 5) -> List[OriginDto]:
     return [
-        ProjectDto(
+        OriginDto(
             x,
-            f"project_{_R.person.identifier()}_{x}",
+            f"origin_{_R.person.identifier()}_{x}",
             _R.person.identifier().split("/")[0],
         )
         for x in range(1, num + 1)
     ]
 
 
-def generate_client_project_splits(
-    project_id: int, num: int = 5
-) -> List[ProjectSplitDto]:
+def generate_client_projects(
+    origin_id: int, num: int = 5
+) -> List[ProjectDto]:
     return [
-        ProjectSplitDto(
+        ProjectDto(
             id=x,
             origin_id=_R.numeric.increment(),
-            project_id=project_id,
+            origin_id=origin_id,
             name=f"{_R.person.full_name()} {_R.person.university()}",
             uri=_R.internet.uri(),
             meta={"key": f"{_R.person.full_name()} {_R.person.university()}"},
@@ -43,7 +43,7 @@ def generate_client_project_splits(
 
 
 def generate_client_version_changes(
-    project_split_id: int,
+    project_id: int,
     num: int = 5,
 ) -> List[VersionChangeDto]:
     return [
@@ -51,7 +51,7 @@ def generate_client_version_changes(
             id=x,
             origin_id=_R.numeric.increment(),
             datetime=_R.datetime.datetime().timestamp(),
-            project_split_id=project_split_id,
+            project_id=project_id,
             entity_type=_R.address.country_code(),
             entity_name=_R.person.surname(),
             task=_R.person.surname(),
@@ -77,19 +77,19 @@ def generate_client_files(
             task=_R.person.surname(),
             element=_R.person.surname(),
             extension=_R.file.extension(),
-            path=f"{_R.path.project_dir()}/{_R.file.file_name()}",
+            path=f"{_R.path.origin_dir()}/{_R.file.file_name()}",
         )
         for x in range(1, num + 1)
     ]
 
 
-def generate_provider_project_splits(
+def generate_provider_origins(
     num: int = 5,
-) -> List[ProjectSplitDto]:
+) -> List[ProjectDto]:
     return [
-        ProjectSplitDto(
+        ProjectDto(
             id=x,
-            tracker_id=_R.person.identifier(),
+            project_tracker_id=_R.person.identifier(),
             name=f"{_R.person.full_name()} {_R.person.university()}",
         )
         for x in range(1, num + 1)
@@ -97,21 +97,21 @@ def generate_provider_project_splits(
 
 
 def generate_provider_version_changes(
-    project_split_id: int,
+    project_id: int,
     num: int = 5,
 ) -> List[VersionChangeDto]:
     return [
         VersionChangeDto(
             id=x,
             datetime=_R.datetime.datetime().timestamp(),
-            project_split_id=project_split_id,
+            project_id=project_id,
             entity_type=_R.address.country_code(),
             entity_name=_R.person.surname(),
             task=_R.person.surname(),
             status=_R.person.surname(),
             revision=_R.numeric.increment(),
             comment=_R.text.quote(),
-            tracker_id=_R.person.identifier(),
+            project_tracker_id=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]
@@ -129,8 +129,8 @@ def generate_provider_files(
             task=_R.person.surname(),
             element=_R.person.surname(),
             extension=_R.file.extension(),
-            path=f"{_R.path.project_dir()}/{_R.file.file_name()}",
-            tracker_id=_R.person.identifier(),
+            path=f"{_R.path.origin_dir()}/{_R.file.file_name()}",
+            project_tracker_id=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]

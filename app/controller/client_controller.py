@@ -6,21 +6,21 @@ from returns.pipeline import flow
 
 from app.domain import client_domain
 from app.domain.client_domain import (
+    create_or_update_origin,
     create_or_update_project,
-    create_or_update_project_split,
 )
 from app.record.client.command import (
-    UpsertProjectSplitCommand,
     UpsertProjectCommand,
-    RemoveProjectCommand,
+    UpsertOriginCommand,
+    RemoveOriginCommand,
     CreateVersionChangeCommand,
     CreateFileCommand,
     UpdateVersionChangeCommand,
 )
 from app.record.client.http_model import (
-    ProjectSplitParams,
-    VersionChangeParams,
     ProjectParams,
+    VersionChangeParams,
+    OriginParams,
     FileParams,
     UpdateVersionChangeParams,
     EnhancedVersionChangeFetchParams,
@@ -37,9 +37,9 @@ _LOG = get_logger(__name__.split(".")[-1])
 router = APIRouter(tags=["client-v1"], prefix="/v1/client")
 
 
-@router.get("/project/{project_name}/version-changes")
-async def version_changes_by_project_name(
-    project_name: str,
+@router.get("/project/{origin_name}/version-changes")
+async def version_changes_by_origin_name(
+    origin_name: str,
     search_params: EnhancedVersionChangeFetchParams = Depends(
         EnhancedVersionChangeFetchParams
     ),
@@ -47,19 +47,19 @@ async def version_changes_by_project_name(
     return await flow(
         search_params,
         boxify_params,
-        VersionChangeQuery.unbox(project_name),
-        client_repo.fetch_version_changes_per_project,
+        VersionChangeQuery.unbox(origin_name),
+        client_repo.fetch_version_changes_per_origin,
     )
 
 
 @router.get("/projects")
 async def projects() -> List[Box]:
-    return await client_repo.fetch_projects()
+    return await client_repo.fetch_origins()
 
 
 @router.get("/projects-splits")
-async def project_splits() -> List[Box]:
-    return await client_repo.fetch_project_splits()
+async def projects() -> List[Box]:
+    return await client_repo.fetch_projects()
 
 
 @router.get("/version-changes")
@@ -87,14 +87,14 @@ async def files(
 
 
 @router.post("/project-split")
-async def upsert_project_split(
-    project_model: ProjectSplitParams,
+async def upsert_project(
+    origin_model: ProjectParams,
 ) -> Any:
     return await flow(
-        project_model,
+        origin_model,
         boxify_params,
-        UpsertProjectSplitCommand.unbox,
-        create_or_update_project_split,
+        UpsertProjectCommand.unbox,
+        create_or_update_project,
         process_result,
     )
 
@@ -113,24 +113,24 @@ async def create_version_change(
 
 
 @router.post("/project")
-async def upsert_project(
-    project_model: ProjectParams,
+async def upsert_origin(
+    origin_model: OriginParams,
 ) -> Any:
     return await flow(
-        project_model,
+        origin_model,
         boxify_params,
-        UpsertProjectCommand.unbox,
-        create_or_update_project,
+        UpsertOriginCommand.unbox,
+        create_or_update_origin,
         process_result,
     )
 
 
 @router.delete("/{id}/project")
-async def remove_project(project_id: int) -> Any:
+async def remove_origin(origin_id: int) -> Any:
     return await flow(
-        project_id,
-        RemoveProjectCommand,
-        client_domain.remove_project,
+        origin_id,
+        RemoveOriginCommand,
+        client_domain.remove_origin,
         process_result,
     )
 

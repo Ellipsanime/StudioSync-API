@@ -45,7 +45,7 @@ def _setup_tasks(app: FastAPI) -> FastAPI:
     @app.on_event("startup")
     @repeat_every(seconds=30)
     async def synchronize_data() -> Any:
-        await sync_domain.synchronize_events()
+        await sync_domain.synchronize_origin()
 
     @app.on_event("startup")
     async def bootstrap_db() -> Any:

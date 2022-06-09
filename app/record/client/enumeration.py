@@ -1,16 +1,16 @@
 from enum import Enum
 
 
-class ProjectField(Enum):
+class OriginField(Enum):
     ID = "id"
     NAME = "name"
     CODE = "code"
 
 
-class ProjectSplitField(Enum):
+class ProjectField(Enum):
     ID = "id"
     ORIGIN_ID = "origin_id"
-    PROJECT_ID = "project_id"
+    PROJECT_ID = "origin_id"
     NAME = "name"
     URI = "uri"
     META = "meta"
@@ -20,7 +20,7 @@ class VersionChangeField(Enum):
     ID = "id"
     ORIGIN_ID = "origin_id"
     DATETIME = "datetime"
-    PROJECT_SPLIT_ID = "project_split_id"
+    PROJECT_SPLIT_ID = "project_id"
     ENTITY_TYPE = "entity_type"
     ENTITY_NAME = "entity_name"
     TASK = "task"
@@ -53,7 +53,7 @@ class EnhancedVersionChangeSearchableField(Enum):
     VERSION_REVISION = "version_revision"
     VERSION_PROCESSED = "version_processed"
     VERSION_COMMENT = "version_comment"
-    PROJECT_SPLIT_NAME = "project_split_name"
+    PROJECT_SPLIT_NAME = "project_name"
     FILE_ID = "file_id"
     FILE_ORIGIN_ID = "file_origin_id"
     FILE_CODE = "file_code"
