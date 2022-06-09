@@ -1,2 +1,2 @@
-# universal-api
-universal-api
+# StudioSync-API
+StudioSync-API
