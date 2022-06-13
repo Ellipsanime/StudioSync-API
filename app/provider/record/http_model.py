@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.record.provider.enumeration import (
+from app.provider.record.enumeration import (
     EnhancedVersionChangeSearchableField,
     EnhancedVersionChangeSortableField,
     VersionChangeField,

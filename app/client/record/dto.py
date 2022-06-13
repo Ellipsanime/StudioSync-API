@@ -8,23 +8,24 @@ from datetime import datetime
 class OriginDto:
     id: int | None
     name: str
-    code: str
+    uri: str
+    crawling_frequency: int
+    connection_info: Dict | None
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class ProjectDto:
     id: int | None
-    origin_id: int
-    origin_id: int
+    provider_project_id: int
     name: str
-    uri: str
-    meta: Dict | None
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class VersionChangeDto:
-    origin_id: int
+    id: int | None
     datetime: datetime
+    provider_version_change_id: int
+    origin_id: int
     project_id: int
     entity_type: str
     entity_name: str
@@ -32,13 +33,13 @@ class VersionChangeDto:
     status: str
     revision: str
     comment: str
-    id: int | None = None
     processed: bool = False
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class FileDto:
-    origin_id: int
+    id: int | None
+    provider_file_id: int
     code: str
     datetime: datetime
     version_change_id: int
@@ -46,4 +47,3 @@ class FileDto:
     element: str
     extension: str
     path: str
-    id: int | None = None

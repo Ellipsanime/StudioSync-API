@@ -3,7 +3,7 @@ from typing import Any
 from box import Box
 from returns.pipeline import flow
 
-from app.record.client.command import (
+from app.client.record.command import (
     UpsertOriginCommand,
     RemoveOriginCommand,
     UpsertProjectCommand,
@@ -11,13 +11,13 @@ from app.record.client.command import (
     CreateFileCommand,
     UpdateVersionChangeCommand,
 )
-from app.record.client.dto import (
+from app.client.record.dto import (
     OriginDto,
     ProjectDto,
     VersionChangeDto, FileDto,
 )
 from app.util.data import dto_from_attr
-from app.writer import client_writer
+from app.client.writer import client_writer
 
 
 async def create_or_update_origin(
@@ -46,7 +46,7 @@ async def create_version_change(
     return await flow(
         command,
         dto_from_attr(VersionChangeDto),
-        client_writer.insert_version_change,
+        client_writer.upsert_version_change,
     )
 
 
@@ -65,7 +65,7 @@ async def create_file(
     return await flow(
         command,
         dto_from_attr(FileDto),
-        client_writer.insert_file,
+        client_writer.upsert_file,
     )
 
 

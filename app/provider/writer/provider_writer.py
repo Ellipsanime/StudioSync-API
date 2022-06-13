@@ -1,27 +1,28 @@
 from box import Box
 from returns.future import future_safe
 
-from app.record.provider.dto import ProjectDto, \
+from app.provider.record.dto import ProjectDto, \
     VersionChangeDto, FileDto
 from app.util import db
 
 
 _SQL_REPLACE_PROJECT_SPLIT = """
-REPLACE INTO provider_project (id, name, project_tracker_id)
+REPLACE INTO provider_project (id, name, tracker_project_id)
 VALUES (?, ?, ?)
 """
 
 _SQL_REPLACE_FILE = """
 REPLACE INTO provider_file (id, code, datetime, task, 
                             version_change_id, element, extension, path, 
-                            project_tracker_id)
+                            tracker_file_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
 _SQL_REPLACE_VERSION_CHANGE = """
 REPLACE INTO provider_version_change (id, datetime, project_id, 
                                       entity_type, entity_name, task, status,
-                                      revision, comment, project_tracker_id)
+                                      revision, comment,
+                                      tracker_version_change_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
@@ -33,7 +34,7 @@ async def upsert_project(project: ProjectDto) -> Box:
         (
             project.id or None,
             project.name,
-            project.project_tracker_id,
+            project.tracker_project_id,
         ),
     )
 
@@ -51,7 +52,7 @@ async def upsert_file(file: FileDto) -> Box:
             file.element,
             file.extension,
             file.path,
-            file.project_tracker_id,
+            file.tracker_file_id,
         ),
     )
 
@@ -72,6 +73,6 @@ async def upsert_version_change(
             version_change.status,
             version_change.revision,
             version_change.comment,
-            version_change.project_tracker_id,
+            version_change.tracker_version_change_id,
         ),
     )

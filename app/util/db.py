@@ -8,13 +8,14 @@ from box import Box
 from app.util.data import boxify
 from app.util.logger import get_logger
 
-_DB = os.environ.get("DB_PATH", "data.db")
 _LOG = get_logger(__name__.split(".")[-1])
 
 
 async def connect_file_db(flag: str = "rwc") -> Connection | None:
     try:
-        db = await aiosqlite.connect(f"file:{_DB}?mode={flag}", uri=True)
+        db_path = os.environ["DB_PATH"]
+        db = await aiosqlite.connect(f"file:{db_path}?mode={flag}", uri=True)
+        await db.set_trace_callback(_LOG.debug)
         cursor = await db.execute("PRAGMA foreign_keys = 1;")
         await cursor.close()
         db.row_factory = aiosqlite.Row

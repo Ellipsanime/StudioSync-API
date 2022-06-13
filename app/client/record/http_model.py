@@ -1,9 +1,10 @@
+import sys
 from datetime import datetime
 from typing import Dict
 
 from pydantic import BaseModel, AnyUrl, Field
 
-from app.record.client.enumeration import (
+from app.client.record.enumeration import (
     EnhancedVersionChangeSearchableField,
     EnhancedVersionChangeSortableField,
     VersionChangeField,
@@ -30,10 +31,15 @@ class VersionChangeFetchParams(PagingParams):
 
 
 class EnhancedVersionChangeFetchParams(PagingParams):
-    filter_field: EnhancedVersionChangeSearchableField | None = Field(
-        title="Filter field name"
+    datetime_min: datetime | None = Field(
+        datetime.fromtimestamp(0),
+        title="Datetime min",
     )
-    filter_value: str | None = Field(title="Filter value")
+    datetime_max: datetime | None = Field(
+        datetime.fromtimestamp(32536799999-1),
+        title="Datetime max",
+    )
+    project_name: str | None = Field(None, title="Project name")
     sort_field: EnhancedVersionChangeSortableField = Field(
         EnhancedVersionChangeSortableField.VERSION_ID,
         title="Sort-by field value",

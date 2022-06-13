@@ -4,25 +4,25 @@ from box import Box
 from fastapi import APIRouter, Depends
 from returns.pipeline import flow
 
-from app.domain import provider_domain
-from app.record.provider.command import (
-    UpsertProjectCommand,
-    UpsertVersionChangeCommand,
-    UpsertFileCommand,
+from app.provider.domain import provider_domain
+from app.provider.record.command import (
+    CreateProjectCommand,
+    CreateVersionChangeCommand,
+    CreateFileCommand,
 )
-from app.record.provider.http_model import (
+from app.provider.record.http_model import (
     EnhancedVersionChangeFetchParams,
     VersionChangeFetchParams,
     FileFetchParams,
 )
 from app.util.data import boxify_params
-from app.record.provider.http_model import (
+from app.provider.record.http_model import (
     OriginParams,
     VersionChangeParams,
     FileParams,
 )
 from app.record.query import VersionChangeQuery, SimpleFetchQuery
-from app.repo import provider_repo
+from app.provider.repo import provider_repo
 from app.util.controller import process_result
 from app.util.logger import get_logger
 
@@ -82,7 +82,7 @@ async def upsert_origin(
     return await flow(
         origin_model,
         boxify_params,
-        UpsertProjectCommand.unbox,
+        CreateProjectCommand.unbox,
         provider_domain.create_or_update_project,
         process_result,
     )
@@ -95,7 +95,7 @@ async def upsert_version_change(
     return await flow(
         version_change_model,
         boxify_params,
-        UpsertVersionChangeCommand.unbox,
+        CreateVersionChangeCommand.unbox,
         provider_domain.create_or_update_version_change,
         process_result,
     )
@@ -106,7 +106,7 @@ async def upsert_file(file_model: FileParams) -> Any:
     return await flow(
         file_model,
         boxify_params,
-        UpsertFileCommand.unbox,
+        CreateFileCommand.unbox,
         provider_domain.create_or_update_file,
         process_result,
     )

@@ -6,11 +6,12 @@ from fastapi_utils.tasks import repeat_every
 from returns.pipeline import pipe
 from starlette.middleware.cors import CORSMiddleware
 
-from app.controller import metadata_controller as meta
-from app.controller import client_controller as client
-from app.controller import provider_controller as provider
-from app.domain import sync_domain
-from app.util import ddl
+from app.client.controller.v1 import (
+    client_controller as client,
+    metadata_controller as meta,
+)
+from app.client.domain import sync_domain
+from app.client.util import ddl
 from app.util.logger import get_logger
 
 _START_EVENT = "startup"
@@ -36,14 +37,13 @@ def _setup_app() -> FastAPI:
     app = FastAPI(**{"title": "Studio Sync API", "version": "0.0.1"})
     app.include_router(meta.router)
     app.include_router(client.router)
-    app.include_router(provider.router)
     return app
 
 
+@lru_cache
 def _setup_tasks(app: FastAPI) -> FastAPI:
-
-    @app.on_event("startup")
-    @repeat_every(seconds=30)
+    # @app.on_event("startup")
+    @repeat_every(seconds=60)
     async def synchronize_data() -> Any:
         await sync_domain.synchronize_origin()
 

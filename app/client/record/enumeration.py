@@ -64,12 +64,12 @@ class EnhancedVersionChangeSearchableField(Enum):
 
 class EnhancedVersionChangeSortableField(Enum):
     VERSION_ID = "version_id"
-    VERSION_ORIGIN_ID = "version_origin_id"
-    VERSION_SOURCE = "version_source"
-    VERSION_TASK = "version_task"
     VERSION_DATETIME = "version_datetime"
+    PROJECT_ID = "project_id"
+    PROJECT_NAME = "project_name"
+    VERSION_TASK = "version_task"
     VERSION_ENTITY_TYPE = "version_entity_type"
     VERSION_ENTITY_NAME = "version_entity_name"
     VERSION_STATUS = "version_status"
     VERSION_REVISION = "version_revision"
-    VERSION_PROCESSED = "version_processed"
+    VERSION_COMMENT = "version_comment"

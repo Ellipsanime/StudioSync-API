@@ -5,22 +5,20 @@ from box import Box
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertProjectCommand:
-    id: int | None
+class CreateProjectCommand:
     name: str
     project_tracker_id: str
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertProjectCommand":
-        return UpsertProjectCommand(
-            data.id or None,
+    def unbox(data: Box) -> "CreateProjectCommand":
+        return CreateProjectCommand(
             data.name,
             data.project_tracker_id
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertVersionChangeCommand:
+class CreateVersionChangeCommand:
     project_tracker_id: str
     datetime: datetime
     project_id: int
@@ -30,11 +28,10 @@ class UpsertVersionChangeCommand:
     status: str
     revision: str
     comment: str
-    id: int | None = None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertVersionChangeCommand":
-        return UpsertVersionChangeCommand(
+    def unbox(data: Box) -> "CreateVersionChangeCommand":
+        return CreateVersionChangeCommand(
             data.project_tracker_id,
             data.datetime.timestamp(),
             data.project_id,
@@ -44,12 +41,11 @@ class UpsertVersionChangeCommand:
             data.status,
             data.revision,
             data.comment,
-            data.id or None,
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class UpsertFileCommand:
+class CreateFileCommand:
     project_tracker_id: str
     code: str
     datetime: datetime
@@ -58,11 +54,10 @@ class UpsertFileCommand:
     element: str
     extension: str
     path: str
-    id: int | None = None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertFileCommand":
-        return UpsertFileCommand(
+    def unbox(data: Box) -> "CreateFileCommand":
+        return CreateFileCommand(
             data.project_tracker_id,
             data.code,
             data.datetime.timestamp(),
@@ -71,5 +66,4 @@ class UpsertFileCommand:
             data.element,
             data.extension,
             data.path,
-            data.id or None,
         )

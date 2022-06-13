@@ -6,13 +6,14 @@ import attr
 @attr.s(auto_attribs=True, frozen=True)
 class ProjectDto:
     id: int | None
-    project_tracker_id: str
+    tracker_project_id: str
     name: str
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class VersionChangeDto:
-    project_tracker_id: str
+    id: int | None
+    tracker_version_change_id: str
     datetime: datetime
     project_id: int
     entity_type: str
@@ -21,13 +22,12 @@ class VersionChangeDto:
     status: str
     revision: str
     comment: str
-    id: int | None = None
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class FileDto:
     id: int | None
-    project_tracker_id: str
+    tracker_file_id: str
     code: str
     datetime: datetime
     version_change_id: int

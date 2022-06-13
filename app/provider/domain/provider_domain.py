@@ -2,17 +2,17 @@ from typing import Any
 
 from returns.pipeline import flow
 
-from app.record.provider.command import (
-    UpsertProjectCommand,
-    UpsertVersionChangeCommand,
+from app.provider.record.command import (
+    CreateProjectCommand,
+    CreateVersionChangeCommand, CreateFileCommand,
 )
 from app.util.data import dto_from_attr
-from app.record.provider.dto import ProjectDto, VersionChangeDto, FileDto
-from app.writer import provider_writer
+from app.provider.record.dto import ProjectDto, VersionChangeDto, FileDto
+from app.provider.writer import provider_writer
 
 
-async def create_or_update_project(
-    command: UpsertProjectCommand,
+async def create_project(
+    command: CreateProjectCommand,
 ) -> Any:
     return await flow(
         command,
@@ -21,8 +21,8 @@ async def create_or_update_project(
     )
 
 
-async def create_or_update_file(
-    command: UpsertVersionChangeCommand,
+async def create_file(
+    command: CreateFileCommand,
 ) -> Any:
     return await flow(
         command,
@@ -31,8 +31,8 @@ async def create_or_update_file(
     )
 
 
-async def create_or_update_version_change(
-    command: UpsertVersionChangeCommand,
+async def create_version_change(
+    command: CreateVersionChangeCommand,
 ) -> Any:
     return await flow(
         command,

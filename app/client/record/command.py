@@ -12,37 +12,35 @@ class RemoveOriginCommand:
 
 @attr.s(auto_attribs=True, frozen=True)
 class UpsertOriginCommand:
-    id: int | None
     name: str
-    code: str
+    uri: str
+    crawling_frequency: int
+    connection_info: Dict | None
+    id: int | None = None
 
     @staticmethod
     def unbox(data: Box) -> "UpsertOriginCommand":
         return UpsertOriginCommand(
-            data.id or None,
             data.name,
-            data.code,
+            data.uri,
+            data.crawling_frequency,
+            data.connection_info,
+            data.id or None,
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class UpsertProjectCommand:
-    id: int | None
-    origin_id: int
-    origin_id: int
     name: str
-    uri: str
-    meta: Dict | None
+    provider_project_id: str | None
+    id: int | None = None
 
     @staticmethod
     def unbox(data: Box) -> "UpsertProjectCommand":
         return UpsertProjectCommand(
-            data.id or None,
-            data.origin_id,
-            data.origin_id,
             data.name,
-            data.uri,
-            data.meta or None,
+            data.provider_project_id,
+            data.id or None,
         )
 
 
@@ -71,6 +69,7 @@ class CreateVersionChangeCommand:
     revision: str
     comment: str
     processed: bool
+    provider_version_change_id: str | None
 
     @staticmethod
     def unbox(data: Box) -> "CreateVersionChangeCommand":
@@ -85,12 +84,12 @@ class CreateVersionChangeCommand:
             data.revision,
             data.comment,
             data.processed or False,
+            data.provider_version_change_id,
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class CreateFileCommand:
-    origin_id: int
     code: str
     datetime: datetime
     version_change_id: int
@@ -98,6 +97,7 @@ class CreateFileCommand:
     element: str
     extension: str
     path: str
+    provider_version_change_id: str | None
 
     @staticmethod
     def unbox(data: Box) -> "CreateFileCommand":

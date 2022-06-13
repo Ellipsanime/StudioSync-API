@@ -3,53 +3,49 @@ from typing import List
 from mimesis import Generic
 from mimesis.enums import Locale
 
-from app.record.client.dto import (
-    OriginDto,
-    ProjectDto,
-    VersionChangeDto,
-    FileDto,
-)
-from app.record.provider.dto import ProjectDto, \
-    VersionChangeDto, FileDto
+import app.client.record.dto as client_dto
+import app.provider.record.dto as provider_dto
+
 
 _R = Generic(locale=Locale.DE)
 
 
-def generate_client_origin(num: int = 5) -> List[OriginDto]:
+def generate_client_origin(num: int = 5) -> List[client_dto.OriginDto]:
     return [
-        OriginDto(
-            x,
-            f"origin_{_R.person.identifier()}_{x}",
-            _R.person.identifier().split("/")[0],
+        client_dto.OriginDto(
+            id=x,
+            name=_R.person.identifier().split("/")[0],
+            uri=_R.internet.uri(),
+            crawling_frequency=_R.numeric.increment(),
+            connection_info={
+                "key": f"{_R.person.full_name()} {_R.person.university()}"
+            },
         )
         for x in range(1, num + 1)
     ]
 
 
-def generate_client_projects(
-    origin_id: int, num: int = 5
-) -> List[ProjectDto]:
+def generate_client_projects(num: int = 5) -> List[client_dto.ProjectDto]:
     return [
-        ProjectDto(
+        client_dto.ProjectDto(
             id=x,
-            origin_id=_R.numeric.increment(),
-            origin_id=origin_id,
-            name=f"{_R.person.full_name()} {_R.person.university()}",
-            uri=_R.internet.uri(),
-            meta={"key": f"{_R.person.full_name()} {_R.person.university()}"},
+            name=_R.person.identifier().split("/")[0],
+            provider_project_id=x * 2,
         )
         for x in range(1, num + 1)
     ]
 
 
 def generate_client_version_changes(
+    origin_id: int,
     project_id: int,
     num: int = 5,
-) -> List[VersionChangeDto]:
+) -> List[client_dto.VersionChangeDto]:
     return [
-        VersionChangeDto(
+        client_dto.VersionChangeDto(
             id=x,
-            origin_id=_R.numeric.increment(),
+            provider_version_change_id=_R.numeric.increment(),
+            origin_id=origin_id,
             datetime=_R.datetime.datetime().timestamp(),
             project_id=project_id,
             entity_type=_R.address.country_code(),
@@ -66,30 +62,30 @@ def generate_client_version_changes(
 
 def generate_client_files(
     num: int = 5, version_id=lambda x: int(x / 10) if int(x / 10) else 1
-) -> List[FileDto]:
+) -> List[client_dto.FileDto]:
     return [
-        FileDto(
+        client_dto.FileDto(
             id=x,
-            origin_id=_R.numeric.increment(),
+            provider_file_id=_R.numeric.increment(),
             datetime=_R.datetime.datetime().timestamp(),
             version_change_id=version_id(x),
             code=_R.address.country_code(),
             task=_R.person.surname(),
             element=_R.person.surname(),
             extension=_R.file.extension(),
-            path=f"{_R.path.origin_dir()}/{_R.file.file_name()}",
+            path=f"{_R.path.project_dir()}/{_R.file.file_name()}",
         )
         for x in range(1, num + 1)
     ]
 
 
-def generate_provider_origins(
+def generate_provider_projects(
     num: int = 5,
-) -> List[ProjectDto]:
+) -> List[provider_dto.ProjectDto]:
     return [
-        ProjectDto(
+        provider_dto.ProjectDto(
             id=x,
-            project_tracker_id=_R.person.identifier(),
+            tracker_project_id=str(_R.person.identifier()),
             name=f"{_R.person.full_name()} {_R.person.university()}",
         )
         for x in range(1, num + 1)
@@ -99,19 +95,19 @@ def generate_provider_origins(
 def generate_provider_version_changes(
     project_id: int,
     num: int = 5,
-) -> List[VersionChangeDto]:
+) -> List[provider_dto.VersionChangeDto]:
     return [
-        VersionChangeDto(
+        provider_dto.VersionChangeDto(
             id=x,
             datetime=_R.datetime.datetime().timestamp(),
             project_id=project_id,
+            tracker_version_change_id=_R.numeric.increment(),
             entity_type=_R.address.country_code(),
             entity_name=_R.person.surname(),
             task=_R.person.surname(),
             status=_R.person.surname(),
             revision=_R.numeric.increment(),
             comment=_R.text.quote(),
-            project_tracker_id=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]
@@ -119,9 +115,9 @@ def generate_provider_version_changes(
 
 def generate_provider_files(
     num: int = 5, version_id=lambda x: int(x / 10) if int(x / 10) else 1
-) -> List[FileDto]:
+) -> List[provider_dto.FileDto]:
     return [
-        FileDto(
+        provider_dto.FileDto(
             id=x,
             datetime=_R.datetime.datetime().timestamp(),
             version_change_id=version_id(x),
@@ -129,10 +125,8 @@ def generate_provider_files(
             task=_R.person.surname(),
             element=_R.person.surname(),
             extension=_R.file.extension(),
-            path=f"{_R.path.origin_dir()}/{_R.file.file_name()}",
-            project_tracker_id=_R.person.identifier(),
+            path=f"{_R.path.project_dir()}/{_R.file.file_name()}",
+            tracker_file_id=_R.person.identifier(),
         )
         for x in range(1, num + 1)
     ]
-
-

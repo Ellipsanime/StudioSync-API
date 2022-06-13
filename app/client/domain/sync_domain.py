@@ -2,7 +2,7 @@ from typing import Any
 
 from returns.pipeline import flow
 
-from app.repo import sync_repo, client_repo
+from app.client.repo import client_repo
 
 
 async def synchronize_origin() -> Any:

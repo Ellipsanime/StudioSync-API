@@ -1,32 +1,38 @@
 import asyncio
+import os
 from typing import Any
 
 from mimesis import Generic
 from mimesis.enums import Locale
 
-from app.writer import client_writer, provider_writer
+from app.client.writer import client_writer
+from app.provider.writer import provider_writer
 from tools.data_generator import (
     generate_client_projects,
     generate_client_version_changes,
     generate_client_files,
-    generate_client_origin, generate_provider_projects,
-    generate_provider_version_changes, generate_provider_files,
+    generate_client_origin,
+    generate_provider_version_changes,
+    generate_provider_files,
+    generate_provider_projects,
 )
 
 _R = Generic(locale=Locale.DE)
 
 
 async def insert() -> Any:
+    os.environ["DB_PATH"] = os.environ["DB_PATH_CLIENT"]
     await insert_at_client_end()
+    os.environ["DB_PATH"] = os.environ["DB_PATH_PROVIDER"]
     await insert_at_provider_end()
 
 
 async def insert_at_client_end() -> Any:
-    project = generate_client_origin(5)[-1]
-    project = generate_client_projects(project.id, 1)[0]
-    versions = generate_client_version_changes(project.id, 10)
+    origin = generate_client_origin(5)[-1]
+    project = generate_client_projects(1)[0]
+    versions = generate_client_version_changes(origin.id, project.id, 10)
     files = generate_client_files(109)
-    await client_writer.upsert_origin(project)
+    await client_writer.upsert_origin(origin)
     await client_writer.upsert_project(project)
     for x in versions:
         await client_writer.upsert_version_change(x)

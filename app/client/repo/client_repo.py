@@ -4,7 +4,7 @@ from returns.pipeline import flow
 
 from box import Box
 
-from app.record.client.dto import ProjectDto
+from app.client.record.dto import ProjectDto
 from app.record.query import VersionChangeQuery, SimpleFetchQuery
 from app.util import db
 from app.util.data import boxify
@@ -31,38 +31,29 @@ def _get_version_change_sql(query: SimpleFetchQuery) -> str:
 
 
 def _get_version_change_view_sql(query: VersionChangeQuery) -> str:
-    if query.value is None:
+    if query.project_name is None:
         return f"""
             SELECT * FROM client_version_file_view
-            WHERE origin_name = ? 
+            WHERE version_datetime >= ? AND version_datetime <= ? 
             ORDER BY {query.sort_field} {query.sort_order}
             LIMIT ? OFFSET ?
         """
-
     return f"""
-        SELECT * FROM client_version_file_view
-        WHERE origin_name = ? AND {query.field} = ? 
-        ORDER BY {query.sort_field} {query.sort_order}
-        LIMIT ? OFFSET ?
+            SELECT * FROM client_version_file_view
+            WHERE version_datetime >= ? 
+                AND version_datetime <= ?
+                AND project_name = ? 
+            ORDER BY {query.sort_field} {query.sort_order}
+            LIMIT ? OFFSET ?
     """
 
 
-async def fetch_version_changes_per_origin(
+async def fetch_version_changes(
     query: VersionChangeQuery,
 ) -> List[Box]:
-    params = tuple(
-        x
-        for x in [
-            query.identifier,
-            query.value,
-            query.limit,
-            query.skip,
-        ]
-        if x is not None
-    )
     raw_changes = await db.fetch_all(
         _get_version_change_view_sql(query),
-        params,
+        query.param_tuple(),
     )
     return [
         map_group(list(g))
@@ -73,11 +64,6 @@ async def fetch_version_changes_per_origin(
 async def fetch_projects() -> List[ProjectDto]:
     raw_origins = await db.fetch_all(_SQL_ALL_PROJECT_SPLITS)
     return [boxify(x) for x in raw_origins]
-
-
-async def fetch_version_changes(query: SimpleFetchQuery) -> List[Box]:
-    version_change = await flow(query, _get_version_change_sql, db.fetch_all)
-    return [convert_datetime(x) for x in version_change]
 
 
 async def fetch_files(query: SimpleFetchQuery) -> List[Box]:

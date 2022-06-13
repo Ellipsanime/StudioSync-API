@@ -1,48 +1,58 @@
-import urllib.parse
-from typing import Any
+from datetime import datetime
+from typing import List, Tuple
 
 import attr
 from box import Box
-from returns.curry import curry
-
-
-@attr.s(auto_attribs=True, frozen=True)
-class VersionChangeQuery:
-    identifier: int | str
-    field: str | None
-    value: Any | None
-    sort_field: str = "version_id"
-    sort_order: str = "ASC"
-    skip: int = 0
-    limit: int = 500
-
-    @staticmethod
-    @curry
-    def unbox(identifier: int | str, data: Box) -> "VersionChangeQuery":
-        return VersionChangeQuery(
-            urllib.parse.unquote(identifier),
-            data.filter_field.value if data.filter_field else None,
-            data.filter_value or None,
-            data.sort_field.value,
-            data.sort_order.value,
-            data.skip or 0,
-            data.limit or 500,
-        )
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class SimpleFetchQuery:
-    sort_field: str = "id"
-    sort_order: str = "ASC"
-    skip: int = 0
-    limit: int = 500
+    sort_field: str
+    sort_order: str
+    skip: int
+    limit: int
 
     @staticmethod
     def unbox(data: Box) -> "SimpleFetchQuery":
         return SimpleFetchQuery(
             data.sort_field.value,
             data.sort_order.value,
-            data.skip or 0,
-            data.limit or 500,
+            data.skip,
+            data.limit,
         )
 
+
+@attr.s(auto_attribs=True, frozen=True)
+class VersionChangeQuery:
+    datetime_min: int
+    datetime_max: int
+    project_name: str | None
+    sort_field: str
+    sort_order: str
+    skip: int
+    limit: int
+
+    def param_tuple(self: "VersionChangeQuery") -> Tuple:
+        return tuple(
+            x
+            for x in [
+                self.datetime_min,
+                self.datetime_max,
+                self.project_name,
+                self.limit,
+                self.skip,
+            ]
+            if x is not None
+        )
+
+    @staticmethod
+    def unbox(data: Box) -> "VersionChangeQuery":
+        return VersionChangeQuery(
+            data.datetime_min.timestamp(),
+            data.datetime_max.timestamp(),
+            data.project_name,
+            data.sort_field.value,
+            data.sort_order.value,
+            data.skip,
+            data.limit,
+        )
