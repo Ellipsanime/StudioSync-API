@@ -6,7 +6,7 @@ from app.provider.record.dto import ProjectDto, \
 from app.util import db
 
 
-_SQL_REPLACE_PROJECT_SPLIT = """
+_SQL_REPLACE_PROJECT = """
 REPLACE INTO provider_project (id, name, tracker_project_id)
 VALUES (?, ?, ?)
 """
@@ -30,7 +30,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 @future_safe
 async def upsert_project(project: ProjectDto) -> Box:
     return await db.write_data(
-        _SQL_REPLACE_PROJECT_SPLIT,
+        _SQL_REPLACE_PROJECT,
         (
             project.id or None,
             project.name,

@@ -2,24 +2,29 @@ from datetime import datetime
 
 import attr
 from box import Box
+from returns.curry import curry
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class CreateProjectCommand:
+class UpsertProjectCommand:
+    id: int | None
     name: str
-    project_tracker_id: str
+    tracker_project_id: str
 
     @staticmethod
-    def unbox(data: Box) -> "CreateProjectCommand":
-        return CreateProjectCommand(
+    @curry
+    def unbox(id_: int | None, data: Box) -> "UpsertProjectCommand":
+        return UpsertProjectCommand(
+            id_,
             data.name,
-            data.project_tracker_id
+            data.tracker_project_id
         )
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class CreateVersionChangeCommand:
-    project_tracker_id: str
+class UpsertVersionChangeCommand:
+    id: int | None
+    tracker_version_change_id: str
     datetime: datetime
     project_id: int
     entity_type: str
@@ -30,9 +35,11 @@ class CreateVersionChangeCommand:
     comment: str
 
     @staticmethod
-    def unbox(data: Box) -> "CreateVersionChangeCommand":
-        return CreateVersionChangeCommand(
-            data.project_tracker_id,
+    @curry
+    def unbox(id_: int | None, data: Box) -> "UpsertVersionChangeCommand":
+        return UpsertVersionChangeCommand(
+            id_,
+            data.tracker_version_change_id,
             data.datetime.timestamp(),
             data.project_id,
             data.entity_type,
@@ -45,8 +52,9 @@ class CreateVersionChangeCommand:
 
 
 @attr.s(auto_attribs=True, frozen=True)
-class CreateFileCommand:
-    project_tracker_id: str
+class UpsertFileCommand:
+    id: int | None
+    tracker_file_id: str
     code: str
     datetime: datetime
     version_change_id: int
@@ -56,9 +64,11 @@ class CreateFileCommand:
     path: str
 
     @staticmethod
-    def unbox(data: Box) -> "CreateFileCommand":
-        return CreateFileCommand(
-            data.project_tracker_id,
+    @curry
+    def unbox(id_: int | None, data: Box) -> "UpsertFileCommand":
+        return UpsertFileCommand(
+            id_,
+            data.tracker_file_id,
             data.code,
             data.datetime.timestamp(),
             data.version_change_id,

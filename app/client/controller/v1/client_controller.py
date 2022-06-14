@@ -17,10 +17,10 @@ from app.client.record.command import (
 )
 from app.client.record.http_model import (
     UpdateVersionChangeParams,
-    VersionChangeFetchParams,
     ProjectParams,
     OriginParams,
 )
+from app.record.http_model import VersionChangeFetchParams
 from app.client.repo import client_repo
 from app.record.query import VersionChangeQuery
 from app.util.controller import process_result
@@ -29,7 +29,7 @@ from app.util.logger import get_logger
 
 _LOG = get_logger(__name__.split(".")[-1])
 
-router = APIRouter(tags=["client"], prefix="/v1")
+router = APIRouter(tags=["client-v1"], prefix="/v1")
 
 
 @router.get("/version-changes")
