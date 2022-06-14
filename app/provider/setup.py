@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from returns.pipeline import pipe
 from starlette.middleware.cors import CORSMiddleware
 
-from app.provider.controller import metadata_controller as meta
+from app.provider.controller import meta_controller as meta
 from app.provider.controller import provider_controller as provider
 from app.provider.util import ddl
 from app.util.logger import get_logger

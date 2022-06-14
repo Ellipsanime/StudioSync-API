@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS client_origin (
     uri TEXT NOT NULL,
     crawling_frequency int,
     connection_info TEXT,
+    UNIQUE(name, uri),
     PRIMARY KEY (id)
 );
 
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS client_project (
     id INTEGER NOT NULL,
     provider_project_id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    UNIQUE(name),
     PRIMARY KEY (id)
 );
 

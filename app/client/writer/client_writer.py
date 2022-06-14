@@ -76,7 +76,7 @@ async def upsert_origin(project: OriginDto) -> Box:
 
 @future_safe
 async def upsert_project(project: ProjectDto) -> Box:
-    return await db.write_data(
+    result = await db.write_data(
         _SQL_REPLACE_PROJECT,
         (
             project.id or None,
@@ -84,6 +84,7 @@ async def upsert_project(project: ProjectDto) -> Box:
             project.provider_project_id,
         ),
     )
+    return result
 
 
 @future_safe

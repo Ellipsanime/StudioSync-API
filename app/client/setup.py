@@ -8,7 +8,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.client.controller.v1 import (
     client_controller as client,
-    metadata_controller as meta,
+    meta_controller as meta,
 )
 from app.client.domain import sync_domain
 from app.client.util import ddl

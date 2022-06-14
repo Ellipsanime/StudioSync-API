@@ -9,7 +9,7 @@ from app.util.logger import get_logger
 _LOG = get_logger(__name__.split(".")[-1])
 
 
-async def process_result(result: IOResult) -> Dict | None:
+async def process_result(result: IOResult) -> Dict:
     match await result:
         case IOSuccess(Success(x)):
             return dict(x)

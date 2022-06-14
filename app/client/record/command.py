@@ -4,6 +4,8 @@ import attr
 from box import Box
 from datetime import datetime
 
+from returns.curry import curry
+
 
 @attr.s(auto_attribs=True, frozen=True)
 class RemoveOriginCommand:
@@ -19,13 +21,14 @@ class UpsertOriginCommand:
     id: int | None = None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertOriginCommand":
+    @curry
+    def unbox(id_: int | None, data: Box) -> "UpsertOriginCommand":
         return UpsertOriginCommand(
             data.name,
             data.uri,
             data.crawling_frequency,
             data.connection_info,
-            data.id or None,
+            id_,
         )
 
 
@@ -36,11 +39,12 @@ class UpsertProjectCommand:
     id: int | None = None
 
     @staticmethod
-    def unbox(data: Box) -> "UpsertProjectCommand":
+    @curry
+    def unbox(id_: int | None, data: Box) -> "UpsertProjectCommand":
         return UpsertProjectCommand(
             data.name,
             data.provider_project_id,
-            data.id or None,
+            id_,
         )
 
 
