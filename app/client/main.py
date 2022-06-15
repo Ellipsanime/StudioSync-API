@@ -5,9 +5,10 @@ import uvicorn
 
 from app.client.setup import setup_all
 
+app = setup_all(None)
+
 
 def start() -> Any:
-    app = setup_all(None)
     port = int(os.getenv("APP_PORT", 8091))
     uvicorn.run(app, host="0.0.0.0", port=port)
 

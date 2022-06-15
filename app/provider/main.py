@@ -6,8 +6,10 @@ import uvicorn
 from app.provider.setup import setup_all
 
 
+app = setup_all(None)
+
+
 def start() -> Any:
-    app = setup_all(None)
     port = int(os.getenv("APP_PORT", 8092))
     uvicorn.run(app, host="0.0.0.0", port=port)
 

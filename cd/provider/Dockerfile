@@ -1,7 +1,7 @@
 FROM python:3.10
-ENV MODULE_NAME app.main:app
+ENV MODULE_NAME app.provider.main:app
 ENV HOST 0.0.0.0
-ENV PORT 8090
+ENV PORT 8092
 ENV WORKERS 1
 ENV WORKER_CLASS uvicorn.workers.UvicornWorker
 ENV DB_PATH /data/db/database.sqlite
