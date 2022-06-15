@@ -22,19 +22,25 @@ CREATE TABLE IF NOT EXISTS provider_project (
 CREATE TABLE IF NOT EXISTS provider_file (
     id INTEGER PRIMARY KEY NOT NULL, 
     tracker_file_id TEXT NULL,
-    code TEXT NOT NULL,
     datetime INTEGER NOT NULL,
     version_change_id INTEGER NOT NULL,
+    
     task TEXT NOT NULL,
+    revision INT NOT NULL,
+    project_id INT NOT NULL,
     element TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_name TEXT NOT NULL,
+    
     extension TEXT NOT NULL,
-    path TEXT NOT NULL,
+    path TEXT NOT NULL, -- JSON [{datetime: str}]
+    UNIQUE(task, revision, project_id, element, entity_type, entity_name),
     CONSTRAINT fk_pvc
         FOREIGN KEY (version_change_id)
         REFERENCES provider_version_change (id) 
 );
 
-CREATE TABLE IF NOT EXISTS provider_version_change (
+CREATE TABLE IF NOT EXISTS provider_version_change ( --provider_event(version_change, file_change, version_new, file_new)
     id INTEGER PRIMARY KEY NOT NULL,
     tracker_version_change_id TEXT NULL,
     datetime INTEGER NOT NULL,
@@ -45,6 +51,7 @@ CREATE TABLE IF NOT EXISTS provider_version_change (
     status TEXT NOT NULL,
     revision INTEGER NOT NULL,
     comment TEXT NOT NULL,
+    payload TEXT NOT NULL, --JSON
     CONSTRAINT fk_pp
         FOREIGN KEY (project_id)
         REFERENCES provider_project (id) 
